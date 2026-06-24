@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Griego I — Vocabularios</title>
+<title>Λεξικόν — Vocabularios de Griego</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -290,7 +290,7 @@ body.phonetics-off .phon-hideable{display:none !important}
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Griego I">
+<meta name="apple-mobile-web-app-title" content="Λεξικόν">
 <link rel="manifest" href="data:application/manifest+json,{%20%20%22name%22:%20%22Griego%20I%20—%20Vocabularios%22,%20%20%22short_name%22:%20%22Griego%20I%22,%20%20%22description%22:%20%22Vocabularios%20de%20Griego%20del%20Nuevo%20Testamento%22,%20%20%22start_url%22:%20%22/%22,%20%20%22display%22:%20%22standalone%22,%20%20%22background_color%22:%20%22%23F7F4EF%22,%20%20%22theme_color%22:%20%22%231a2e4a%22,%20%20%22orientation%22:%20%22portrait%22,%20%20%22icons%22:%20[%20%20%20%20{%20%20%20%20%20%20%22src%22:%20%22data:image/svg+xml,<svg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20192%20192%27><rect%20width=%27192%27%20height=%27192%27%20rx=%2724%27%20fill=%27%231a2e4a%27/><text%20x=%2750%%27%20y=%2758%%27%20font-size=%27110%27%20text-anchor=%27middle%27%20dominant-baseline=%27middle%27%20fill=%27%23F0EAD6%27%20font-family=%27serif%27>α</text></svg>%22,%20%20%20%20%20%20%22sizes%22:%20%22192x192%22,%20%20%20%20%20%20%22type%22:%20%22image/svg+xml%22,%20%20%20%20%20%20%22purpose%22:%20%22any%20maskable%22%20%20%20%20}%20%20]}">
 <!-- Google Identity Services -->
 <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -299,8 +299,8 @@ body.phonetics-off .phon-hideable{display:none !important}
 <div class="app">
 
 <div class="app-header">
-  <div class="app-title">Γρεγο Ι — Βοκαβυλαριος</div>
-  <div class="app-title-sub">Griego I &mdash; Vocabularios</div>
+  <div class="app-title">Λεξικόν</div>
+  <div class="app-title-sub">Vocabularios de Griego &mdash; Universidad Adventista del Plata</div>
 </div>
 
 <!-- AUTH & SYNC BAR -->
@@ -1627,12 +1627,15 @@ async function loadProgress(){
 }
 
 // ── AUTH ──
+let reconnectTimer = null;
+
 function initGoogleAuth(){
   if(!window.google) return;
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
     scope: SCOPES,
     callback: async (resp) => {
+      if(reconnectTimer){ clearTimeout(reconnectTimer); reconnectTimer=null; }
       if(resp.error){ setSyncStatus('offline','Error de autenticación'); return; }
       accessToken = resp.access_token;
       localStorage.setItem('griego_drive_authorized','1');
@@ -1648,6 +1651,17 @@ function initGoogleAuth(){
     setTimeout(()=>{
       tokenClient.requestAccessToken({prompt:''});
     }, 500);
+    // Fallback: si a los 8 segundos no llegó respuesta, volver a estado offline
+    // El flag localStorage se preserva para que el usuario pueda reintentar
+    reconnectTimer = setTimeout(()=>{
+      reconnectTimer = null;
+      if(!accessToken){
+        setSyncStatus('offline','Sin conexión con Drive');
+        document.getElementById('sync-btn').textContent='Conectar con Google Drive';
+        document.getElementById('sync-btn').classList.remove('signout');
+        document.getElementById('sync-btn').onclick=handleAuthClick;
+      }
+    }, 8000);
   }
 }
 
