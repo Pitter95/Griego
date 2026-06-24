@@ -1940,7 +1940,12 @@ function switchSection(s){
   document.getElementById('section-morfo').style.display = s==='morfo' ? '' : 'none';
   document.getElementById('secbtn-vocab').classList.toggle('active', s==='vocab');
   document.getElementById('secbtn-morfo').classList.toggle('active', s==='morfo');
-  if(s==='morfo') initMorfoSection();
+  if(s==='morfo'){
+    try { initMorfoSection(); }
+    catch(e){
+      document.getElementById('section-morfo').innerHTML += '<div style="padding:1rem;color:red;font-size:12px">Error: ' + e.message + '</div>';
+    }
+  }
 }
 
 // ── MORPHOLOGY DATA (Velardo GEGNT Griego I) ──
@@ -2013,98 +2018,75 @@ function buildMorfoCards(filter, mode){
 
   // Artículo
   if(filter==='all' || filter==='articulo'){
-    ARTICULO.forEach(r=>{
-      ['m','f','n'].forEach(g=>{
-        const genLabel = g==='m'?'masc.':g==='f'?'fem.':'neutro';
-        const form = r[g];
-        if(isConj){
-          cards.push({
-            cat:'articulo', filter:'articulo',
-            prompt:`Artículo — ${r.caso} ${genLabel}`,
-            answer: form,
-            desc: `Art. ${genLabel} ${r.caso}`,
-            tag:'Artículo'
-          });
-        } else {
-          cards.push({
-            cat:'articulo', filter:'articulo',
-            prompt:`Artículo ${genLabel} — ${r.caso}`,
-            answer: form,
-            desc:``,
-            tag:'Artículo'
-          });
-        }
+    ARTICULO.forEach(function(r){
+      var genLabels = {m:'masc.', f:'fem.', n:'neutro'};
+      ['m','f','n'].forEach(function(g){
+        var genLabel = genLabels[g];
+        cards.push({
+          cat:'articulo', filter:'articulo',
+          prompt: 'Artículo ' + genLabel + ' — ' + r.caso,
+          answer: r[g],
+          desc: isConj ? 'Art. determinado' : '',
+          tag: 'Artículo'
+        });
       });
     });
   }
 
   // 1ª Declinación
   if(filter==='all' || filter==='1decl'){
-    DECL1.forEach(r=>{
+    DECL1.forEach(function(r){
       cards.push({
         cat:'1decl', filter:'1decl',
-        prompt: isConj ? `1ª Decl. Femenino — ${r.caso}` : `Desinencia 1ª Decl. — ${r.caso}`,
+        prompt: '1ª Declinación — ' + r.caso,
         answer: r.mf,
-        desc: isConj ? `Ej.: ἡ ἀγάπη (${r.caso.includes('S')?'sg.':'pl.'})` : '',
-        tag:'1ª Declinación'
+        desc: isConj ? ('Ej.: ἡ ἀγάπη, ' + r.caso) : '',
+        tag: '1ª Declinación'
       });
     });
   }
 
   // 2ª Declinación M/F
   if(filter==='all' || filter==='2decl'){
-    DECL2_MF.forEach(r=>{
+    DECL2_MF.forEach(function(r){
       cards.push({
         cat:'2decl', filter:'2decl',
-        prompt: isConj ? `2ª Decl. Masc./Fem. — ${r.caso}` : `Desinencia 2ª Decl. M/F — ${r.caso}`,
+        prompt: '2ª Decl. Masc./Fem. — ' + r.caso,
         answer: r.des,
-        desc: isConj ? `Ej.: ὁ λόγος (${r.caso.includes('S')?'sg.':'pl.'})` : '',
-        tag:'2ª Declinación M/F'
+        desc: isConj ? ('Ej.: ὁ λόγος, ' + r.caso) : '',
+        tag: '2ª Decl. M/F'
       });
     });
-    DECL2_N.forEach(r=>{
+    DECL2_N.forEach(function(r){
       cards.push({
         cat:'2decl', filter:'2decl',
-        prompt: isConj ? `2ª Decl. Neutro — ${r.caso}` : `Desinencia 2ª Decl. Neutro — ${r.caso}`,
+        prompt: '2ª Decl. Neutro — ' + r.caso,
         answer: r.des,
-        desc: isConj ? `Ej.: τὸ ἔργον (${r.caso.includes('S')?'sg.':'pl.'})` : '',
-        tag:'2ª Declinación Neutro'
+        desc: isConj ? ('Ej.: τὸ ἔργον, ' + r.caso) : '',
+        tag: '2ª Decl. Neutro'
       });
     });
   }
 
   // Verbal
-  const tiempoFiltros = {
+  var tiempoFiltros = {
     'presente':0,'aoristo':1,'imperfecto':2,'perfecto':3,'futuro':4
   };
-  const voces = ['activa','media','pasiva'];
-  const verbLabels = ['λύω','γράφω','πιστεύω'];
+  var voces = ['activa','media','pasiva'];
 
-  Object.entries(tiempoFiltros).forEach(([fname, ti])=>{
+  Object.keys(tiempoFiltros).forEach(function(fname){
+    var ti = tiempoFiltros[fname];
     if(filter!=='all' && filter!==fname) return;
-    voces.forEach(voz=>{
-      VERBAL.personas.forEach((pers, pi)=>{
-        const des = VERBAL[voz][ti][pi];
-        if(isConj){
-          // Show forms for 2-3 different verbs
-          const verbIdx = pi % verbLabels.length;
-          const verb = verbLabels[verbIdx];
-          cards.push({
-            cat:'verbal', filter:fname,
-            prompt:`Ind. ${VERBAL.abrev[ti]} ${voz} — ${pers}`,
-            answer: des,
-            desc: `Desinencia en ${verb}: ${verb.replace('ω',des.replace('‑',''))}`,
-            tag:`${VERBAL.tiempos[ti]} ${voz}`
-          });
-        } else {
-          cards.push({
-            cat:'verbal', filter:fname,
-            prompt:`Ind. ${VERBAL.abrev[ti]} ${voz} — ${pers}`,
-            answer: des,
-            desc:'',
-            tag:`${VERBAL.tiempos[ti]} ${voz}`
-          });
-        }
+    voces.forEach(function(voz){
+      VERBAL.personas.forEach(function(pers, pi){
+        var des = VERBAL[voz][ti][pi];
+        cards.push({
+          cat:'verbal', filter:fname,
+          prompt: 'Ind. ' + VERBAL.abrev[ti] + ' ' + voz + ' — ' + pers,
+          answer: des,
+          desc: isConj ? ('Ej.: λύω → ' + des) : '',
+          tag: VERBAL.tiempos[ti] + ' ' + voz
+        });
       });
     });
   });
