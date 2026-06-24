@@ -181,8 +181,8 @@ body.phonetics-off .phon-hideable{display:none !important}
 .win-btn:hover{background:var(--cream-bg)}
 /* SYNC BAR */
 /* SECTION SELECTOR */
-.section-selector{display:flex;gap:8px;margin-bottom:1rem}
-.section-btn{flex:1;padding:.55rem 1rem;border:1.5px solid var(--cream-border);border-radius:8px;background:#fff;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
+.section-selector{display:flex;gap:8px;margin-bottom:1rem;flex-wrap:wrap}
+.section-btn{flex:1;min-width:120px;padding:.55rem .8rem;border:1.5px solid var(--cream-border);border-radius:8px;background:#fff;color:var(--text-muted);font-size:13px;font-weight:500;cursor:pointer;transition:all .15s}
 .section-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
 .section-btn:hover:not(.active){background:var(--cream-dark)}
 
@@ -384,7 +384,8 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
 <!-- SECTION SELECTOR -->
 <div class="section-selector">
   <button class="section-btn active" id="secbtn-vocab" onclick="switchSection('vocab')">Vocabularios</button>
-  <button class="section-btn" id="secbtn-morfo" onclick="switchSection('morfo')">Morfología</button>
+  <button class="section-btn" id="secbtn-nominal" onclick="switchSection('nominal')">Flexión nominal</button>
+  <button class="section-btn" id="secbtn-verbal" onclick="switchSection('verbal')">Flexión verbal</button>
 </div>
 
 <!-- VOCAB SECTION -->
@@ -561,83 +562,119 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
 </div>
 </div><!-- end section-vocab -->
 
-<!-- MORPHOLOGY SECTION -->
-<div id="section-morfo" style="display:none">
+<!-- NOMINAL SECTION -->
+<div id="section-nominal" style="display:none">
 
-<!-- MORFO STATUS BAR -->
+<div class="morfo-tabs">
+  <button class="morfo-tab active" id="ntab-cards" onclick="showNominalTab('cards')">Tarjetas</button>
+  <button class="morfo-tab" id="ntab-quiz" onclick="showNominalTab('quiz')">Quiz</button>
+  <button class="morfo-tab" id="ntab-match" onclick="showNominalTab('match')">Emparejar</button>
+  <button class="morfo-tab" id="ntab-quick" onclick="showNominalTab('quick')">Vista rápida</button>
+</div>
+
+<div class="morfo-filter-bar">
+  <button class="morfo-filter-chip active" onclick="setNominalFilter('all',this)">Todo</button>
+  <button class="morfo-filter-chip" onclick="setNominalFilter('articulo',this)">Artículo</button>
+  <button class="morfo-filter-chip" onclick="setNominalFilter('1decl',this)">1ª Declinación</button>
+  <button class="morfo-filter-chip" onclick="setNominalFilter('2decl',this)">2ª Declinación</button>
+</div>
+
+<div id="ntab-cards-content">
+  <div class="morfo-flip-hint">Tocá la tarjeta para revelar la respuesta</div>
+  <div class="morfo-prog-bar" style="height:4px;background:var(--cream-border);border-radius:4px;margin-bottom:.6rem">
+    <div id="nominal-prog-fill" style="height:4px;background:var(--navy);border-radius:4px;width:0%;transition:width .3s"></div>
+  </div>
+  <div class="morfo-card-area" id="nominal-card-area" onclick="flipNominalCard()"></div>
+  <div class="morfo-nav">
+    <button onclick="nominalCardNav(-1)">← Anterior</button>
+    <span class="morfo-nav-info" id="nominal-card-info"></span>
+    <button onclick="nominalCardNav(1)">Siguiente →</button>
+  </div>
+</div>
+
+<div id="ntab-quiz-content" style="display:none">
+  <div class="morfo-quiz-score">
+    <div class="score-item"><div class="score-num" id="nq-correct">0</div><div class="score-label">correctas</div></div>
+    <div class="score-item"><div class="score-num" id="nq-total">0</div><div class="score-label">intentos</div></div>
+    <div class="score-item"><div class="score-num" id="nq-pct">—</div><div class="score-label">precisión</div></div>
+  </div>
+  <div id="nominal-quiz-area"></div>
+</div>
+
+<div id="ntab-match-content" style="display:none">
+  <div style="font-size:12px;color:var(--text-muted);margin-bottom:.6rem">Seleccioná una forma y su descripción morfológica.</div>
+  <div class="morfo-match-grid" id="nominal-match-grid"></div>
+  <div id="nominal-match-status" style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:.5rem"></div>
+  <button onclick="initNominalMatch()" style="margin-top:.8rem;padding:.4rem 1rem;border:1px solid var(--cream-border);border-radius:8px;background:#fff;font-size:13px;cursor:pointer">Nueva ronda</button>
+</div>
+
+<div id="ntab-quick-content" style="display:none">
+  <div id="nominal-quick-area"></div>
+</div>
+
+</div><!-- end section-nominal -->
+
+<!-- VERBAL SECTION -->
+<div id="section-verbal" style="display:none">
+
 <div class="morfo-status-bar">
   <div class="morfo-mode-toggle">
     <span>Modo:</span>
-    <button id="morfo-mode-des" class="active" onclick="setMorfoMode('des')">Desinencias</button>
-    <button id="morfo-mode-conj" onclick="setMorfoMode('conj')">Formas conjugadas</button>
+    <button id="verbal-mode-des" class="active" onclick="setVerbalMode('des')">Desinencias</button>
+    <button id="verbal-mode-conj" onclick="setVerbalMode('conj')">Formas conjugadas</button>
   </div>
 </div>
 
-<!-- MORFO TABS -->
 <div class="morfo-tabs">
-  <button class="morfo-tab active" id="mtab-cards" onclick="showMorfoTab('cards')">Tarjetas</button>
-  <button class="morfo-tab" id="mtab-list" onclick="showMorfoTab('list')">Lista</button>
-  <button class="morfo-tab" id="mtab-quiz" onclick="showMorfoTab('quiz')">Quiz</button>
-  <button class="morfo-tab" id="mtab-match" onclick="showMorfoTab('match')">Emparejar</button>
-  <button class="morfo-tab" id="mtab-quick" onclick="showMorfoTab('quick')">Vista rápida</button>
+  <button class="morfo-tab active" id="vtab-cards" onclick="showVerbalTab('cards')">Tarjetas</button>
+  <button class="morfo-tab" id="vtab-quiz" onclick="showVerbalTab('quiz')">Quiz</button>
+  <button class="morfo-tab" id="vtab-match" onclick="showVerbalTab('match')">Emparejar</button>
+  <button class="morfo-tab" id="vtab-quick" onclick="showVerbalTab('quick')">Vista rápida</button>
 </div>
 
-<!-- MORFO FILTER -->
-<div class="morfo-filter-bar" id="morfo-filter-bar">
-  <button class="morfo-filter-chip active" onclick="setMorfoFilter('all',this)">Todo</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('articulo',this)">Artículo</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('1decl',this)">1ª Decl.</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('2decl',this)">2ª Decl.</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('presente',this)">Presente</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('imperfecto',this)">Imperfecto</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('aoristo',this)">Aoristo</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('perfecto',this)">Perfecto</button>
-  <button class="morfo-filter-chip" onclick="setMorfoFilter('futuro',this)">Futuro</button>
+<div class="morfo-filter-bar">
+  <button class="morfo-filter-chip active" onclick="setVerbalFilter('all',this)">Todo</button>
+  <button class="morfo-filter-chip" onclick="setVerbalFilter('presente',this)">Presente</button>
+  <button class="morfo-filter-chip" onclick="setVerbalFilter('aoristo',this)">Aoristo</button>
+  <button class="morfo-filter-chip" onclick="setVerbalFilter('imperfecto',this)">Imperfecto</button>
+  <button class="morfo-filter-chip" onclick="setVerbalFilter('perfecto',this)">Perfecto</button>
+  <button class="morfo-filter-chip" onclick="setVerbalFilter('futuro',this)">Futuro</button>
 </div>
 
-<!-- MORFO: TARJETAS -->
-<div id="mtab-cards-content">
+<div id="vtab-cards-content">
   <div class="morfo-flip-hint">Tocá la tarjeta para revelar la respuesta</div>
   <div class="morfo-prog-bar" style="height:4px;background:var(--cream-border);border-radius:4px;margin-bottom:.6rem">
-    <div id="morfo-prog-fill" style="height:4px;background:var(--navy);border-radius:4px;width:0%;transition:width .3s"></div>
+    <div id="verbal-prog-fill" style="height:4px;background:var(--navy);border-radius:4px;width:0%;transition:width .3s"></div>
   </div>
-  <div class="morfo-card-area" id="morfo-card-area" onclick="flipMorfoCard()"></div>
+  <div class="morfo-card-area" id="verbal-card-area" onclick="flipVerbalCard()"></div>
   <div class="morfo-nav">
-    <button onclick="morfoCardNav(-1)">← Anterior</button>
-    <span class="morfo-nav-info" id="morfo-card-info"></span>
-    <button onclick="morfoCardNav(1)">Siguiente →</button>
+    <button onclick="verbalCardNav(-1)">← Anterior</button>
+    <span class="morfo-nav-info" id="verbal-card-info"></span>
+    <button onclick="verbalCardNav(1)">Siguiente →</button>
   </div>
 </div>
 
-<!-- MORFO: LISTA -->
-<div id="mtab-list-content" style="display:none">
-  <div class="morfo-table-wrap" id="morfo-list-content"></div>
-</div>
-
-<!-- MORFO: QUIZ -->
-<div id="mtab-quiz-content" style="display:none">
+<div id="vtab-quiz-content" style="display:none">
   <div class="morfo-quiz-score">
-    <div class="score-item"><div class="score-num" id="mq-correct">0</div><div class="score-label">correctas</div></div>
-    <div class="score-item"><div class="score-num" id="mq-total">0</div><div class="score-label">intentos</div></div>
-    <div class="score-item"><div class="score-num" id="mq-pct">—</div><div class="score-label">precisión</div></div>
+    <div class="score-item"><div class="score-num" id="vq-correct">0</div><div class="score-label">correctas</div></div>
+    <div class="score-item"><div class="score-num" id="vq-total">0</div><div class="score-label">intentos</div></div>
+    <div class="score-item"><div class="score-num" id="vq-pct">—</div><div class="score-label">precisión</div></div>
   </div>
-  <div id="morfo-quiz-area"></div>
+  <div id="verbal-quiz-area"></div>
 </div>
 
-<!-- MORFO: EMPAREJAR -->
-<div id="mtab-match-content" style="display:none">
-  <div style="font-size:12px;color:var(--text-muted);margin-bottom:.6rem">Seleccioná una forma griega y su descripción morfológica.</div>
-  <div class="morfo-match-grid" id="morfo-match-grid"></div>
-  <div id="morfo-match-status" style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:.5rem"></div>
-  <button onclick="initMorfoMatch()" style="margin-top:.8rem;padding:.4rem 1rem;border:1px solid var(--cream-border);border-radius:8px;background:#fff;font-size:13px;cursor:pointer">Nueva ronda</button>
+<div id="vtab-match-content" style="display:none">
+  <div style="font-size:12px;color:var(--text-muted);margin-bottom:.6rem">Seleccioná una forma y su descripción morfológica.</div>
+  <div class="morfo-match-grid" id="verbal-match-grid"></div>
+  <div id="verbal-match-status" style="text-align:center;font-size:13px;color:var(--text-muted);margin-top:.5rem"></div>
+  <button onclick="initVerbalMatch()" style="margin-top:.8rem;padding:.4rem 1rem;border:1px solid var(--cream-border);border-radius:8px;background:#fff;font-size:13px;cursor:pointer">Nueva ronda</button>
 </div>
 
-<!-- MORFO: VISTA RÁPIDA -->
-<div id="mtab-quick-content" style="display:none">
-  <div id="morfo-quick-area"></div>
+<div id="vtab-quick-content" style="display:none">
+  <div id="verbal-quick-area"></div>
 </div>
 
-</div><!-- end section-morfo -->
+</div><!-- end section-verbal -->
 
 <script>
 
@@ -1936,477 +1973,539 @@ function kittelNote(w){
 
 // ── SECTION SWITCHING ──
 function switchSection(s){
-  document.getElementById('section-vocab').style.display = s==='vocab' ? 'block' : 'none';
-  document.getElementById('section-morfo').style.display = s==='morfo' ? 'block' : 'none';
-  document.getElementById('secbtn-vocab').classList.toggle('active', s==='vocab');
-  document.getElementById('secbtn-morfo').classList.toggle('active', s==='morfo');
-  if(s==='morfo'){
-    try { initMorfoSection(); }
-    catch(e){
-      document.getElementById('section-morfo').innerHTML += '<div style="padding:1rem;color:red;font-size:12px">Error: ' + e.message + '</div>';
-    }
-  }
+  ['vocab','nominal','verbal'].forEach(function(x){
+    document.getElementById('section-'+x).style.display = x===s ? 'block' : 'none';
+    document.getElementById('secbtn-'+x).classList.toggle('active', x===s);
+  });
+  if(s==='nominal') initNominal();
+  if(s==='verbal') initVerbal();
 }
 
-// ── MORPHOLOGY DATA (Velardo GEGNT Griego I) ──
-// Paradigma del artículo
-const ARTICULO = [
-  {caso:'NS', m:'ὁ', f:'ἡ', n:'τό'},
-  {caso:'GS', m:'τοῦ', f:'τῆς', n:'τοῦ'},
-  {caso:'DS', m:'τῷ', f:'τῇ', n:'τῷ'},
-  {caso:'AS', m:'τόν', f:'τήν', n:'τό'},
-  {caso:'NP', m:'οἱ', f:'αἱ', n:'τά'},
-  {caso:'GP', m:'τῶν', f:'τῶν', n:'τῶν'},
+// ══════════════════════════════════════════
+// DATOS MORFOLÓGICOS (Velardo, GEGNT G1)
+// ══════════════════════════════════════════
+
+// Artículo (orden del apunte: NS GS DS AS NP GP DP AP)
+var ARTICULO = [
+  {caso:'NS', m:'ὁ',    f:'ἡ',    n:'τό'},
+  {caso:'GS', m:'τοῦ',  f:'τῆς',  n:'τοῦ'},
+  {caso:'DS', m:'τῷ',   f:'τῇ',   n:'τῷ'},
+  {caso:'AS', m:'τόν',  f:'τήν',  n:'τό'},
+  {caso:'NP', m:'οἱ',   f:'αἱ',   n:'τά'},
+  {caso:'GP', m:'τῶν',  f:'τῶν',  n:'τῶν'},
   {caso:'DP', m:'τοῖς', f:'ταῖς', n:'τοῖς'},
-  {caso:'AP', m:'τούς', f:'τάς', n:'τά'},
+  {caso:'AP', m:'τούς', f:'τάς',  n:'τά'},
 ];
-// Paradigma 1ª y 2ª declinación (desinencias)
-const DECL1 = [
-  {caso:'NS', mf:'‑α / ‑η'}, {caso:'GS', mf:'‑ας / ‑ης'}, {caso:'DS', mf:'‑ᾳ / ‑ῃ'}, {caso:'AS', mf:'‑αν / ‑ην'},
-  {caso:'NP', mf:'‑αι'}, {caso:'GP', mf:'‑ων'}, {caso:'DP', mf:'‑αις'}, {caso:'AP', mf:'‑ας'},
+
+// 1ª Declinación (F/M) — orden del apunte
+var DECL1 = [
+  {caso:'NS', des:'‑α / ‑η'},
+  {caso:'GS', des:'‑ας / ‑ης'},
+  {caso:'DS', des:'‑ᾳ / ‑ῃ'},
+  {caso:'AS', des:'‑αν / ‑ην'},
+  {caso:'NP', des:'‑αι'},
+  {caso:'GP', des:'‑ων'},
+  {caso:'DP', des:'‑αις'},
+  {caso:'AP', des:'‑ας'},
 ];
-const DECL2_MF = [
+
+// 2ª Declinación — orden del apunte
+var DECL2_MF = [
   {caso:'NS', des:'‑ος'}, {caso:'GS', des:'‑ου'}, {caso:'DS', des:'‑ῳ'}, {caso:'AS', des:'‑ον'},
   {caso:'NP', des:'‑οι'}, {caso:'GP', des:'‑ων'}, {caso:'DP', des:'‑οις'}, {caso:'AP', des:'‑ους'},
 ];
-const DECL2_N = [
+var DECL2_N = [
   {caso:'NS', des:'‑ον'}, {caso:'GS', des:'‑ου'}, {caso:'DS', des:'‑ῳ'}, {caso:'AS', des:'‑ον'},
-  {caso:'NP', des:'‑α'}, {caso:'GP', des:'‑ων'}, {caso:'DP', des:'‑οις'}, {caso:'AP', des:'‑α'},
+  {caso:'NP', des:'‑α'},  {caso:'GP', des:'‑ων'}, {caso:'DP', des:'‑οις'}, {caso:'AP', des:'‑α'},
 ];
 
-// Verbos de ejemplo para formas conjugadas (del vocabulario)
-const VERBS_CONJ = ['λύω','γράφω','πιστεύω'];
-// Paradigma verbal completo modo indicativo (Velardo)
-// Formato: [voz_activa, voz_media, voz_pasiva] x [pte,aor,imperf,pto,fto]
-const VERBAL = {
+// Verbal — exactamente el orden de Velardo:
+// Presente · Aoristo · Imperfecto · Perfecto · Futuro
+var VERBAL = {
   personas: ['1S','2S','3S','1P','2P','3P'],
-  tiempos: ['Presente','Aoristo','Imperfecto','Perfecto','Futuro'],
-  abrev: ['pte.','aor.','imperf.','pto.','fto.'],
+  tiempos:  ['Presente','Aoristo','Imperfecto','Perfecto','Futuro'],
+  abrev:    ['pte.','aor.','imperf.','pto.','fto.'],
   activa: [
-    ['‑ω','‑εις','‑ει','‑ομεν','‑ετε','‑ουσι(ν)'],          // pte
-    ['‑σα','‑σας','‑σε(ν)','‑σαμεν','‑σατε','‑σαν'],          // aor (aum.)
-    ['‑ον','‑ες','‑ε(ν)','‑ομεν','‑ετε','‑ον'],               // imperf (aum.)
-    ['‑κα','‑κας','‑κε(ν)','‑καμεν','‑κατε','‑κασι(ν)'],     // pto (redup.)
-    ['‑σω','‑σεις','‑σει','‑σομεν','‑σετε','‑σουσι(ν)'],     // fto
+    ['‑ω','‑εις','‑ει','‑ομεν','‑ετε','‑ουσι(ν)'],
+    ['‑σα','‑σας','‑σε(ν)','‑σαμεν','‑σατε','‑σαν'],
+    ['‑ον','‑ες','‑ε(ν)','‑ομεν','‑ετε','‑ον'],
+    ['‑κα','‑κας','‑κε(ν)','‑καμεν','‑κατε','‑κασι(ν)'],
+    ['‑σω','‑σεις','‑σει','‑σομεν','‑σετε','‑σουσι(ν)'],
   ],
   media: [
-    ['‑ομαι','‑ῃ','‑εται','‑ομεθα','‑εσθε','‑ονται'],        // pte
-    ['‑σαμην','‑σω','‑σατο','‑σαμεθα','‑σασθε','‑σαντο'],    // aor (aum.)
-    ['‑ομην','‑ου','‑ετο','‑ομεθα','‑εσθε','‑οντο'],          // imperf (aum.)
-    ['‑μαι','‑σαι','‑ται','‑μεθα','‑σθε','‑νται'],            // pto (redup.)
-    ['‑σομαι','‑σῃ','‑σεται','‑σομεθα','‑σεσθε','‑σονται'],  // fto
+    ['‑ομαι','‑ῃ','‑εται','‑ομεθα','‑εσθε','‑ονται'],
+    ['‑σαμην','‑σω','‑σατο','‑σαμεθα','‑σασθε','‑σαντο'],
+    ['‑ομην','‑ου','‑ετο','‑ομεθα','‑εσθε','‑οντο'],
+    ['‑μαι','‑σαι','‑ται','‑μεθα','‑σθε','‑νται'],
+    ['‑σομαι','‑σῃ','‑σεται','‑σομεθα','‑σεσθε','‑σονται'],
   ],
   pasiva: [
-    ['‑ομαι','‑ῃ','‑εται','‑ομεθα','‑εσθε','‑ονται'],        // pte (= media)
-    ['‑θην','‑θης','‑θη','‑θημεν','‑θητε','‑θησαν'],          // aor (aum.)
-    ['‑ομην','‑ου','‑ετο','‑ομεθα','‑εσθε','‑οντο'],          // imperf (= media)
-    ['‑μαι','‑σαι','‑ται','‑μεθα','‑σθε','‑νται'],            // pto (= media)
-    ['‑θησομαι','‑θησῃ','‑θησεται','‑θησομεθα','‑θησεσθε','‑θησονται'], // fto
+    ['‑ομαι','‑ῃ','‑εται','‑ομεθα','‑εσθε','‑ονται'],
+    ['‑θην','‑θης','‑θη','‑θημεν','‑θητε','‑θησαν'],
+    ['‑ομην','‑ου','‑ετο','‑ομεθα','‑εσθε','‑οντο'],
+    ['‑μαι','‑σαι','‑ται','‑μεθα','‑σθε','‑νται'],
+    ['‑θησομαι','‑θησῃ','‑θησεται','‑θησομεθα','‑θησεσθε','‑θησονται'],
   ],
-  // Formas conjugadas ejemplo con λύω/γράφω/πιστεύω (stems)
-  stems: {
-    'λύω': {stem:'λυ', aor_stem:'ελυσ', perf_stem:'λελυκ', aor_pas:'ελυθ', fut_stem:'λυσ'},
-    'γράφω': {stem:'γραφ', aor_stem:'εγραψ', perf_stem:'γεγραφ', aor_pas:'εγραφθ', fut_stem:'γραψ'},
-    'πιστεύω': {stem:'πιστευ', aor_stem:'επιστευσ', perf_stem:'πεπιστευκ', aor_pas:'επιστευθ', fut_stem:'πιστευσ'},
-  }
 };
 
-// Build a flat array of morphology cards
-function buildMorfoCards(filter, mode){
-  const cards = [];
-  const isConj = mode === 'conj';
+// Stems λύω para formas conjugadas
+var CONJ_STEMS = {
+  activa:  ['λυ','ἐλυσ','ἐλυ','λελυκ','λυσ'],
+  media:   ['λυ','ἐλυσ','ἐλυ','λελυ','λυσ'],
+  pasiva:  ['λυ','ἐλυθ','ἐλυ','λελυ','λυθησ'],
+};
 
-  // Artículo
+// ══════════════════════════════════════════
+// SECCIÓN NOMINAL
+// ══════════════════════════════════════════
+var nominalFilter = 'all';
+var nominalTab = 'cards';
+var nominalCards = [];
+var nominalCardPos = 0;
+var nominalCardFlipped = false;
+var nqCorrect = 0, nqTotal = 0;
+var nominalMatchFirst = null, nominalMatchedPairs = 0;
+
+function buildNominalCards(filter){
+  var cards = [];
+
   if(filter==='all' || filter==='articulo'){
+    var genLabels = {m:'masc.',f:'fem.',n:'neutro'};
     ARTICULO.forEach(function(r){
-      var genLabels = {m:'masc.', f:'fem.', n:'neutro'};
       ['m','f','n'].forEach(function(g){
-        var genLabel = genLabels[g];
         cards.push({
-          cat:'articulo', filter:'articulo',
-          prompt: 'Artículo ' + genLabel + ' — ' + r.caso,
+          tag:'Artículo',
+          prompt:'Artículo ' + genLabels[g] + ' — ' + r.caso,
           answer: r[g],
-          desc: isConj ? 'Art. determinado' : '',
-          tag: 'Artículo'
+          desc:''
         });
       });
     });
   }
 
-  // 1ª Declinación
   if(filter==='all' || filter==='1decl'){
     DECL1.forEach(function(r){
       cards.push({
-        cat:'1decl', filter:'1decl',
-        prompt: '1ª Declinación — ' + r.caso,
-        answer: r.mf,
-        desc: isConj ? ('Ej.: ἡ ἀγάπη, ' + r.caso) : '',
-        tag: '1ª Declinación'
+        tag:'1ª Declinación',
+        prompt:'1ª Decl. — ' + r.caso,
+        answer: r.des,
+        desc:'Sustantivos femeninos (y algunos masc.)'
       });
     });
   }
 
-  // 2ª Declinación M/F
   if(filter==='all' || filter==='2decl'){
     DECL2_MF.forEach(function(r){
       cards.push({
-        cat:'2decl', filter:'2decl',
-        prompt: '2ª Decl. Masc./Fem. — ' + r.caso,
+        tag:'2ª Decl. M/F',
+        prompt:'2ª Decl. Masc./Fem. — ' + r.caso,
         answer: r.des,
-        desc: isConj ? ('Ej.: ὁ λόγος, ' + r.caso) : '',
-        tag: '2ª Decl. M/F'
+        desc:'Ej.: ὁ λόγος'
       });
     });
     DECL2_N.forEach(function(r){
       cards.push({
-        cat:'2decl', filter:'2decl',
-        prompt: '2ª Decl. Neutro — ' + r.caso,
+        tag:'2ª Decl. Neutro',
+        prompt:'2ª Decl. Neutro — ' + r.caso,
         answer: r.des,
-        desc: isConj ? ('Ej.: τὸ ἔργον, ' + r.caso) : '',
-        tag: '2ª Decl. Neutro'
+        desc:'Ej.: τὸ ἔργον'
       });
     });
   }
-
-  // Verbal
-  var tiempoFiltros = {
-    'presente':0,'aoristo':1,'imperfecto':2,'perfecto':3,'futuro':4
-  };
-  var voces = ['activa','media','pasiva'];
-
-  Object.keys(tiempoFiltros).forEach(function(fname){
-    var ti = tiempoFiltros[fname];
-    if(filter!=='all' && filter!==fname) return;
-    voces.forEach(function(voz){
-      VERBAL.personas.forEach(function(pers, pi){
-        var des = VERBAL[voz][ti][pi];
-        cards.push({
-          cat:'verbal', filter:fname,
-          prompt: 'Ind. ' + VERBAL.abrev[ti] + ' ' + voz + ' — ' + pers,
-          answer: des,
-          desc: isConj ? ('Ej.: λύω → ' + des) : '',
-          tag: VERBAL.tiempos[ti] + ' ' + voz
-        });
-      });
-    });
-  });
 
   return cards;
 }
 
-// ── MORPHOLOGY STATE ──
-let morfoMode = 'des'; // 'des' | 'conj'
-let morfoFilter = 'all';
-let morfoTab = 'cards';
-let morfoCards = [];
-let morfoCardPos = 0;
-let morfoCardFlipped = false;
-let morfoQuizQueue = [];
-let morfoQuizPos = 0;
-let mqCorrect = 0, mqTotal = 0;
-let morfoMatchFirst = null;
-let morfoMatchedPairs = 0;
-
-function initMorfoSection(){
-  morfoCards = buildMorfoCards(morfoFilter, morfoMode);
-  morfoCardPos = 0; morfoCardFlipped = false;
-  showMorfoTab(morfoTab);
+function initNominal(){
+  nominalCards = buildNominalCards(nominalFilter);
+  nominalCardPos = 0; nominalCardFlipped = false;
+  showNominalTab(nominalTab);
 }
 
-function setMorfoMode(m){
-  morfoMode = m;
-  document.getElementById('morfo-mode-des').classList.toggle('active', m==='des');
-  document.getElementById('morfo-mode-conj').classList.toggle('active', m==='conj');
-  initMorfoSection();
-}
-
-function setMorfoFilter(f, btn){
-  morfoFilter = f;
-  document.querySelectorAll('.morfo-filter-chip').forEach(b=>b.classList.remove('active'));
+function setNominalFilter(f, btn){
+  nominalFilter = f;
+  document.querySelectorAll('#section-nominal .morfo-filter-chip').forEach(function(b){ b.classList.remove('active'); });
   btn.classList.add('active');
-  initMorfoSection();
+  initNominal();
 }
 
-function showMorfoTab(t){
-  morfoTab = t;
-  ['cards','list','quiz','match','quick'].forEach(x=>{
-    document.getElementById('mtab-'+x+'-content').style.display = x===t?'':'none';
-    document.getElementById('mtab-'+x).classList.toggle('active', x===t);
+function showNominalTab(t){
+  nominalTab = t;
+  ['cards','quiz','match','quick'].forEach(function(x){
+    document.getElementById('ntab-'+x+'-content').style.display = x===t ? 'block' : 'none';
+    document.getElementById('ntab-'+x).classList.toggle('active', x===t);
   });
-  morfoCards = buildMorfoCards(morfoFilter, morfoMode);
-  if(t==='cards') renderMorfoCard();
-  else if(t==='list') renderMorfoList();
-  else if(t==='quiz') initMorfoQuiz();
-  else if(t==='match') initMorfoMatch();
-  else if(t==='quick') renderMorfoQuick();
+  nominalCards = buildNominalCards(nominalFilter);
+  if(t==='cards') renderNominalCard();
+  else if(t==='quiz') initNominalQuiz();
+  else if(t==='match') initNominalMatch();
+  else if(t==='quick') renderNominalQuick();
 }
 
-// ── TARJETAS ──
-function renderMorfoCard(){
-  const area = document.getElementById('morfo-card-area');
-  const info = document.getElementById('morfo-card-info');
-  const prog = document.getElementById('morfo-prog-fill');
-  if(!morfoCards.length){area.innerHTML='<div class="empty-state">Sin cartas para este filtro.</div>';return;}
-  const c = morfoCards[morfoCardPos];
-  prog.style.width = Math.round((morfoCardPos+1)/morfoCards.length*100)+'%';
-  info.textContent = `${morfoCardPos+1} / ${morfoCards.length}`;
-  if(!morfoCardFlipped){
-    area.innerHTML=`<div class="morfo-card">
-      <div class="morfo-card-tag">${c.tag}</div>
-      <div class="morfo-card-prompt">${c.prompt}</div>
-      <div class="morfo-card-hint">Tocá para revelar</div>
-    </div>`;
+function renderNominalCard(){
+  var area = document.getElementById('nominal-card-area');
+  var info = document.getElementById('nominal-card-info');
+  var prog = document.getElementById('nominal-prog-fill');
+  if(!nominalCards.length){ area.innerHTML='<div class="empty-state">Sin tarjetas para este filtro.</div>'; return; }
+  var c = nominalCards[nominalCardPos];
+  prog.style.width = Math.round((nominalCardPos+1)/nominalCards.length*100)+'%';
+  info.textContent = (nominalCardPos+1) + ' / ' + nominalCards.length;
+  if(!nominalCardFlipped){
+    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
   } else {
-    area.innerHTML=`<div class="morfo-card">
-      <div class="morfo-card-tag">${c.tag}</div>
-      <div class="morfo-card-prompt">${c.prompt}</div>
-      <div class="morfo-card-answer">${c.answer}</div>
-      ${c.desc?`<div class="morfo-card-desc">${c.desc}</div>`:''}
-    </div>`;
+    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-prompt">'+c.prompt+'</div>'+(c.desc?'<div class="morfo-card-desc">'+c.desc+'</div>':'')+'</div>';
   }
 }
-function flipMorfoCard(){ morfoCardFlipped=!morfoCardFlipped; renderMorfoCard(); }
-function morfoCardNav(d){
-  morfoCardPos = Math.max(0, Math.min(morfoCards.length-1, morfoCardPos+d));
-  morfoCardFlipped = false;
-  renderMorfoCard();
+function flipNominalCard(){ nominalCardFlipped=!nominalCardFlipped; renderNominalCard(); }
+function nominalCardNav(d){ nominalCardPos=Math.max(0,Math.min(nominalCards.length-1,nominalCardPos+d)); nominalCardFlipped=false; renderNominalCard(); }
+
+function renderNominalList(){
+  var area = document.getElementById('nominal-list-content');
+  var html = '';
+
+  if(nominalFilter==='all'||nominalFilter==='articulo'){
+    html += '<div class="morfo-paradigm-title">Paradigma flexivo completo del artículo</div>';
+    html += '<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th></tr></thead><tbody>';
+    ARTICULO.forEach(function(r){
+      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div>';
+  }
+
+  if(nominalFilter==='all'||nominalFilter==='1decl'){
+    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 1ª Declinación (F/M)</div>';
+    html += '<table class="morfo-table"><thead><tr><th></th><th>1ª Decl.</th></tr></thead><tbody>';
+    DECL1.forEach(function(r){
+      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  if(nominalFilter==='all'||nominalFilter==='2decl'){
+    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 2ª Declinación</div>';
+    html += '<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>2ª Decl. N</th></tr></thead><tbody>';
+    DECL2_MF.forEach(function(r,i){
+      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL2_N[i].des+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div>';
+  }
+
+  area.innerHTML = html || '<div class="empty-state">Sin contenido.</div>';
 }
 
-// ── LISTA ──
-function renderMorfoList(){
-  const area = document.getElementById('morfo-list-content');
-  let html = '';
-
-  // Artículo
-  if(morfoFilter==='all'||morfoFilter==='articulo'){
-    html += `<div class="morfo-paradigm-title">Artículo</div>
-    <table class="morfo-table"><thead><tr><th>Caso</th><th>Masc.</th><th>Fem.</th><th>Neutro</th></tr></thead><tbody>`;
-    ARTICULO.forEach(r=>{
-      html+=`<tr><td>${r.caso}</td><td class="greek">${r.m}</td><td class="greek">${r.f}</td><td class="greek">${r.n}</td></tr>`;
-    });
-    html+='</tbody></table>';
+function initNominalQuiz(){
+  nominalCards = buildNominalCards(nominalFilter);
+  nqCorrect=0; nqTotal=0;
+  updateNominalScore();
+  renderNominalQuiz(0);
+}
+function updateNominalScore(){
+  document.getElementById('nq-correct').textContent=nqCorrect;
+  document.getElementById('nq-total').textContent=nqTotal;
+  document.getElementById('nq-pct').textContent=nqTotal?Math.round(nqCorrect/nqTotal*100)+'%':'—';
+}
+var nQuizPos = 0;
+var nQuizQueue = [];
+function renderNominalQuiz(pos){
+  nQuizPos = pos;
+  var area = document.getElementById('nominal-quiz-area');
+  if(!nQuizQueue.length || pos===0){ nQuizQueue=[...nominalCards].sort(function(){return Math.random()-.5;}); }
+  if(pos>=nQuizQueue.length){
+    area.innerHTML='<div style="text-align:center;padding:2rem"><div style="font-size:24px">✓</div><div style="font-weight:600;color:var(--navy);margin:.5rem 0">Ronda completada</div><div style="color:var(--text-muted);font-size:13px">'+nqCorrect+' / '+nqTotal+' correctas</div><button onclick="initNominalQuiz()" style="margin-top:1rem;padding:.5rem 1.5rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Nueva ronda</button></div>';
+    return;
   }
+  var c = nQuizQueue[pos];
+  var pool = nominalCards.filter(function(x){return x.answer!==c.answer;}).map(function(x){return x.answer;});
+  var wrongs = pool.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(){return Math.random()-.5;}).slice(0,3);
+  var opts = [c.answer].concat(wrongs).sort(function(){return Math.random()-.5;});
+  area.innerHTML='<div class="morfo-quiz-q"><div class="morfo-quiz-q-label">'+c.tag+'</div><div class="morfo-quiz-q-greek">'+c.prompt+'</div></div><div class="morfo-quiz-opts">'+opts.map(function(o){return '<button class="morfo-quiz-opt" onclick="checkNominalQuiz(\''+o+'\',\''+c.answer+'\',this)">'+o+'</button>';}).join('')+'</div><div id="nq-feedback"></div>';
+}
+function checkNominalQuiz(chosen,correct,btn){
+  nqTotal++;
+  document.querySelectorAll('#nominal-quiz-area .morfo-quiz-opt').forEach(function(b){b.disabled=true;});
+  var ok=chosen===correct;
+  if(ok)nqCorrect++;
+  btn.classList.add(ok?'correct':'wrong');
+  document.querySelectorAll('#nominal-quiz-area .morfo-quiz-opt').forEach(function(b){if(b.textContent===correct)b.classList.add('correct');});
+  var fb=document.getElementById('nq-feedback');
+  fb.className='morfo-quiz-feedback '+(ok?'ok':'err');
+  fb.textContent=ok?'✓ Correcto':'✗ Era: '+correct;
+  updateNominalScore();
+  setTimeout(function(){renderNominalQuiz(nQuizPos+1);},1200);
+}
 
-  // 1ª Declinación
-  if(morfoFilter==='all'||morfoFilter==='1decl'){
-    html+=`<div class="morfo-paradigm-title">1ª Declinación (desinencias)</div>
-    <table class="morfo-table"><thead><tr><th>Caso</th><th>Fem./Masc.</th></tr></thead><tbody>`;
-    DECL1.forEach(r=>{
-      html+=`<tr><td>${r.caso}</td><td class="greek">${r.mf}</td></tr>`;
-    });
-    html+='</tbody></table>';
+function initNominalMatch(){
+  nominalMatchFirst=null; nominalMatchedPairs=0;
+  var pool=buildNominalCards(nominalFilter).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;}).sort(function(){return Math.random()-.5;}).slice(0,5);
+  var lefts=pool.map(function(c,i){return {id:i,type:'prompt',text:c.prompt,pair:i};});
+  var rights=pool.map(function(c,i){return {id:i+100,type:'answer',text:c.answer,pair:i,greek:true};});
+  var all=[].concat(lefts,rights).sort(function(){return Math.random()-.5;});
+  document.getElementById('nominal-match-grid').innerHTML=all.map(function(item){return '<button class="morfo-match-btn'+(item.greek?' greek':'')+'" data-id="'+item.id+'" data-pair="'+item.pair+'" data-type="'+item.type+'" onclick="selectNominalMatch(this)">'+item.text+'</button>';}).join('');
+  document.getElementById('nominal-match-status').textContent='0 / '+pool.length+' pares';
+}
+function selectNominalMatch(btn){
+  if(btn.classList.contains('matched'))return;
+  if(!nominalMatchFirst){nominalMatchFirst=btn;btn.classList.add('selected');return;}
+  if(nominalMatchFirst===btn){nominalMatchFirst.classList.remove('selected');nominalMatchFirst=null;return;}
+  var p1=nominalMatchFirst.dataset.pair,p2=btn.dataset.pair,t1=nominalMatchFirst.dataset.type,t2=btn.dataset.type;
+  if(p1===p2&&t1!==t2){
+    nominalMatchFirst.classList.remove('selected');nominalMatchFirst.classList.add('matched');btn.classList.add('matched');
+    nominalMatchedPairs++;
+    var pool=buildNominalCards(nominalFilter).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;});
+    document.getElementById('nominal-match-status').textContent=nominalMatchedPairs+' / '+Math.min(5,pool.length)+' pares';
+    nominalMatchFirst=null;
+  } else {
+    nominalMatchFirst.classList.remove('selected');nominalMatchFirst.classList.add('error');btn.classList.add('error');
+    var f=nominalMatchFirst,b=btn;setTimeout(function(){f.classList.remove('error');b.classList.remove('error');},600);nominalMatchFirst=null;
   }
+}
 
-  // 2ª Declinación
-  if(morfoFilter==='all'||morfoFilter==='2decl'){
-    html+=`<div class="morfo-paradigm-title">2ª Declinación (desinencias)</div>
-    <table class="morfo-table"><thead><tr><th>Caso</th><th>Masc./Fem.</th><th>Neutro</th></tr></thead><tbody>`;
-    DECL2_MF.forEach((r,i)=>{
-      html+=`<tr><td>${r.caso}</td><td class="greek">${r.des}</td><td class="greek">${DECL2_N[i].des}</td></tr>`;
-    });
-    html+='</tbody></table>';
+function renderNominalQuick(){
+  var area=document.getElementById('nominal-quick-area');
+  var html='';
+  if(nominalFilter==='all'||nominalFilter==='articulo'){
+    html+='<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma flexivo completo del artículo</div>';
+    html+='<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th></tr></thead><tbody>';
+    ARTICULO.forEach(function(r){html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td></tr>';});
+    html+='</tbody></table><div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div></div>';
   }
+  if(nominalFilter==='all'||nominalFilter==='1decl'||nominalFilter==='2decl'){
+    html+='<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma flexivo casual de 1ª y 2ª declinación</div>';
+    html+='<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>1ª Decl. F/M</th><th>2ª Decl. N</th></tr></thead><tbody>';
+    DECL2_MF.forEach(function(r,i){html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL1[i].des+'</td><td class="greek">'+DECL2_N[i].des+'</td></tr>';});
+    html+='</tbody></table><div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div></div>';
+  }
+  area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
+}
 
-  // Verbal — una tabla por tiempo+voz filtrado
-  const tiempoFiltros = {
-    'presente':0,'aoristo':1,'imperfecto':2,'perfecto':3,'futuro':4
-  };
-  const voces = ['activa','media','pasiva'];
-  Object.entries(tiempoFiltros).forEach(([fname, ti])=>{
-    if(morfoFilter!=='all' && morfoFilter!==fname) return;
-    voces.forEach(voz=>{
-      html+=`<div class="morfo-paradigm-title">Ind. ${VERBAL.tiempos[ti]} — Voz ${voz}</div>
-      <table class="morfo-table"><thead><tr><th>Persona</th><th>Desinencia</th>`;
-      if(morfoMode==='conj'){
-        html+=`<th>λύω</th><th>γράφω</th><th>πιστεύω</th>`;
-      }
-      html+=`</tr></thead><tbody>`;
-      VERBAL.personas.forEach((p,pi)=>{
-        const des = VERBAL[voz][ti][pi];
-        html+=`<tr><td>${p}</td><td class="greek">${des}</td>`;
-        if(morfoMode==='conj'){
-          // Simple conjugated form display (stem + ending approximation)
-          ['λύω','γράφω','πιστεύω'].forEach(v=>{
-            const stems = {'λύω':'λυ','γράφω':'γραφ','πιστεύω':'πιστευ'};
-            const augStems = {'λύω':'ελυ','γράφω':'εγραφ','πιστεύω':'επιστευ'};
-            const aorStems = {'λύω':'ελυσ','γράφω':'εγραψ','πιστεύω':'επιστευσ'};
-            const perfStems = {'λύω':'λελυκ','γράφω':'γεγραφ','πιστεύω':'πεπιστευκ'};
-            const futStems = {'λύω':'λυσ','γράφω':'γραψ','πιστεύω':'πιστευσ'};
-            const aosPasStems = {'λύω':'ελυθ','γράφω':'εγραφθ','πιστεύω':'επιστευθ'};
-            let base;
-            if(ti===0) base=stems[v]; // pte
-            else if(ti===1 && voz==='activa') base=aorStems[v];
-            else if(ti===1 && voz==='media') base=aorStems[v];
-            else if(ti===1 && voz==='pasiva') base=aosPasStems[v];
-            else if(ti===2) base=augStems[v]; // imperf
-            else if(ti===3) base=perfStems[v]; // pto
-            else if(ti===4 && voz==='pasiva') base=aosPasStems[v].replace('ε','')+'σο';
-            else base=futStems[v];
-            const cleanDes = des.replace(/‑/g,'').replace(/\(ν\)/,'ν').replace(/\(ν\)/,'ν');
-            html+=`<td class="greek">${base}${cleanDes}</td>`;
-          });
-        }
+// ══════════════════════════════════════════
+// SECCIÓN VERBAL
+// ══════════════════════════════════════════
+var verbalMode = 'des';
+var verbalFilter = 'all';
+var verbalTab = 'cards';
+var verbalCards = [];
+var verbalCardPos = 0;
+var verbalCardFlipped = false;
+var vqCorrect = 0, vqTotal = 0;
+var verbalMatchFirst = null, verbalMatchedPairs = 0;
+
+var TIEMPO_ORDEN = ['presente','aoristo','imperfecto','perfecto','futuro'];
+var TIEMPO_IDX   = {presente:0,aoristo:1,imperfecto:2,perfecto:3,futuro:4};
+var VOCES = ['activa','media','pasiva'];
+
+function buildVerbalCards(filter, mode){
+  var cards = [];
+  var isConj = mode==='conj';
+  TIEMPO_ORDEN.forEach(function(fname){
+    if(filter!=='all' && filter!==fname) return;
+    var ti = TIEMPO_IDX[fname];
+    VOCES.forEach(function(voz){
+      VERBAL.personas.forEach(function(pers,pi){
+        var des = VERBAL[voz][ti][pi];
+        var cleanDes = des.replace(/‑/g,'').replace(/\(ν\)/,'ν');
+        var answer = isConj ? (CONJ_STEMS[voz][ti]+cleanDes) : des;
+        var prompt = isConj
+          ? ('¿Qué forma es '+answer+'? (λύω, '+voz+')')
+          : ('Ind. '+VERBAL.abrev[ti]+' '+voz+' — '+pers);
+        cards.push({
+          tag: VERBAL.tiempos[ti]+' '+voz,
+          prompt: prompt,
+          answer: answer,
+          desc: isConj ? ('Ind. '+VERBAL.abrev[ti]+' '+voz+' '+pers) : ''
+        });
+      });
+    });
+  });
+  return cards;
+}
+
+function initVerbal(){
+  verbalCards = buildVerbalCards(verbalFilter, verbalMode);
+  verbalCardPos=0; verbalCardFlipped=false;
+  showVerbalTab(verbalTab);
+}
+
+function setVerbalMode(m){
+  verbalMode=m;
+  document.getElementById('verbal-mode-des').classList.toggle('active',m==='des');
+  document.getElementById('verbal-mode-conj').classList.toggle('active',m==='conj');
+  initVerbal();
+}
+
+function setVerbalFilter(f,btn){
+  verbalFilter=f;
+  document.querySelectorAll('#section-verbal .morfo-filter-chip').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  initVerbal();
+}
+
+function showVerbalTab(t){
+  verbalTab=t;
+  ['cards','quiz','match','quick'].forEach(function(x){
+    document.getElementById('vtab-'+x+'-content').style.display=x===t?'block':'none';
+    document.getElementById('vtab-'+x).classList.toggle('active',x===t);
+  });
+  verbalCards=buildVerbalCards(verbalFilter,verbalMode);
+  if(t==='cards') renderVerbalCard();
+  else if(t==='quiz') initVerbalQuiz();
+  else if(t==='match') initVerbalMatch();
+  else if(t==='quick') renderVerbalQuick();
+}
+
+function renderVerbalCard(){
+  var area=document.getElementById('verbal-card-area');
+  var info=document.getElementById('verbal-card-info');
+  var prog=document.getElementById('verbal-prog-fill');
+  if(!verbalCards.length){area.innerHTML='<div class="empty-state">Sin tarjetas.</div>';return;}
+  var c=verbalCards[verbalCardPos];
+  prog.style.width=Math.round((verbalCardPos+1)/verbalCards.length*100)+'%';
+  info.textContent=(verbalCardPos+1)+' / '+verbalCards.length;
+  if(!verbalCardFlipped){
+    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
+  } else {
+    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-prompt">'+c.prompt+'</div>'+(c.desc?'<div class="morfo-card-desc">'+c.desc+'</div>':'')+'</div>';
+  }
+}
+function flipVerbalCard(){verbalCardFlipped=!verbalCardFlipped;renderVerbalCard();}
+function verbalCardNav(d){verbalCardPos=Math.max(0,Math.min(verbalCards.length-1,verbalCardPos+d));verbalCardFlipped=false;renderVerbalCard();}
+
+function renderVerbalList(){
+  var area=document.getElementById('verbal-list-content');
+  var html='';
+  TIEMPO_ORDEN.forEach(function(fname){
+    if(verbalFilter!=='all'&&verbalFilter!==fname)return;
+    var ti=TIEMPO_IDX[fname];
+    VOCES.forEach(function(voz){
+      html+='<div class="morfo-paradigm-title">Ind. '+VERBAL.tiempos[ti]+' — Voz '+voz+'</div>';
+      html+='<table class="morfo-table"><thead><tr><th>Persona</th><th>Desinencia</th>';
+      if(verbalMode==='conj') html+='<th>λύω (ej.)</th>';
+      html+='</tr></thead><tbody>';
+      VERBAL.personas.forEach(function(p,pi){
+        var des=VERBAL[voz][ti][pi];
+        var cleanDes=des.replace(/‑/g,'').replace(/\(ν\)/,'ν');
+        var conj=CONJ_STEMS[voz][ti]+cleanDes;
+        // Media y pasiva idénticas excepto aoristo(1) y futuro(4)
+        var isGrey=(voz==='pasiva')&&(ti!==1&&ti!==4);
+        html+='<tr><td>'+p+'</td><td class="greek'+(isGrey?' grey':'')+'">'+des+'</td>';
+        if(verbalMode==='conj') html+='<td class="greek">'+conj+'</td>';
         html+='</tr>';
       });
       html+='</tbody></table>';
     });
   });
-
-  area.innerHTML = html || '<div class="empty-state">Sin contenido para este filtro.</div>';
+  if(verbalFilter==='all'||verbalFilter==='aoristo'||verbalFilter==='futuro'){
+    html+='<div class="morfo-quick-note">* Las voces media y pasiva tienen la misma conjugación, excepto en el aoristo y en el futuro (marcadas en gris las iguales a la media).<br>* El aumento (ε) indica tiempo pasado. La reduplicación indica perfecto.</div>';
+  }
+  area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
 }
 
-// ── QUIZ ──
-function initMorfoQuiz(){
-  morfoCards = buildMorfoCards(morfoFilter, morfoMode);
-  morfoQuizQueue = [...morfoCards].sort(()=>Math.random()-.5);
-  morfoQuizPos = 0; mqCorrect = 0; mqTotal = 0;
-  updateMorfoQuizScore();
-  renderMorfoQuiz();
+var vQuizPos=0, vQuizQueue=[];
+function initVerbalQuiz(){
+  verbalCards=buildVerbalCards(verbalFilter,verbalMode);
+  vqCorrect=0;vqTotal=0;vQuizQueue=[];
+  updateVerbalScore();renderVerbalQuiz(0);
 }
-function updateMorfoQuizScore(){
-  document.getElementById('mq-correct').textContent = mqCorrect;
-  document.getElementById('mq-total').textContent = mqTotal;
-  document.getElementById('mq-pct').textContent = mqTotal?Math.round(mqCorrect/mqTotal*100)+'%':'—';
+function updateVerbalScore(){
+  document.getElementById('vq-correct').textContent=vqCorrect;
+  document.getElementById('vq-total').textContent=vqTotal;
+  document.getElementById('vq-pct').textContent=vqTotal?Math.round(vqCorrect/vqTotal*100)+'%':'—';
 }
-function renderMorfoQuiz(){
-  const area = document.getElementById('morfo-quiz-area');
-  if(!morfoQuizQueue.length){area.innerHTML='<div class="empty-state">Sin contenido para este filtro.</div>';return;}
-  if(morfoQuizPos >= morfoQuizQueue.length){
-    area.innerHTML=`<div style="text-align:center;padding:2rem">
-      <div style="font-size:24px">✓</div>
-      <div style="font-weight:600;color:var(--navy);margin:.5rem 0">Ronda completada</div>
-      <div style="color:var(--text-muted);font-size:13px">${mqCorrect} / ${mqTotal} correctas</div>
-      <button onclick="initMorfoQuiz()" style="margin-top:1rem;padding:.5rem 1.5rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Nueva ronda</button>
-    </div>`;
+function renderVerbalQuiz(pos){
+  vQuizPos=pos;
+  var area=document.getElementById('verbal-quiz-area');
+  if(!vQuizQueue.length||pos===0){vQuizQueue=[...verbalCards].sort(function(){return Math.random()-.5;});}
+  if(pos>=vQuizQueue.length){
+    area.innerHTML='<div style="text-align:center;padding:2rem"><div style="font-size:24px">✓</div><div style="font-weight:600;color:var(--navy);margin:.5rem 0">Ronda completada</div><div style="color:var(--text-muted);font-size:13px">'+vqCorrect+' / '+vqTotal+' correctas</div><button onclick="initVerbalQuiz()" style="margin-top:1rem;padding:.5rem 1.5rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Nueva ronda</button></div>';
     return;
   }
-  const c = morfoQuizQueue[morfoQuizPos];
-  // Build 3 wrong answers from same filter
-  const pool = morfoCards.filter(x=>x.answer!==c.answer).map(x=>x.answer);
-  const wrongs = [...new Set(pool)].sort(()=>Math.random()-.5).slice(0,3);
-  const opts = [c.answer, ...wrongs].sort(()=>Math.random()-.5);
-  area.innerHTML=`
-    <div class="morfo-quiz-q">
-      <div class="morfo-quiz-q-label">${c.tag}</div>
-      <div class="morfo-quiz-q-greek">${c.prompt}</div>
-    </div>
-    <div class="morfo-quiz-opts" id="mq-opts">
-      ${opts.map(o=>`<button class="morfo-quiz-opt" onclick="checkMorfoQuiz('${o}','${c.answer}',this)">${o}</button>`).join('')}
-    </div>
-    <div id="mq-feedback"></div>`;
+  var c=vQuizQueue[pos];
+  var pool=verbalCards.filter(function(x){return x.answer!==c.answer;}).map(function(x){return x.answer;});
+  var wrongs=pool.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(){return Math.random()-.5;}).slice(0,3);
+  var opts=[c.answer].concat(wrongs).sort(function(){return Math.random()-.5;});
+  area.innerHTML='<div class="morfo-quiz-q"><div class="morfo-quiz-q-label">'+c.tag+'</div><div class="morfo-quiz-q-greek">'+c.prompt+'</div></div><div class="morfo-quiz-opts">'+opts.map(function(o){return '<button class="morfo-quiz-opt" onclick="checkVerbalQuiz(\''+o+'\',\''+c.answer+'\',this)">'+o+'</button>';}).join('')+'</div><div id="vq-feedback"></div>';
 }
-function checkMorfoQuiz(chosen, correct, btn){
-  mqTotal++;
-  const opts = document.querySelectorAll('.morfo-quiz-opt');
-  opts.forEach(b=>b.disabled=true);
-  const ok = chosen===correct;
-  if(ok) mqCorrect++;
+function checkVerbalQuiz(chosen,correct,btn){
+  vqTotal++;
+  document.querySelectorAll('#verbal-quiz-area .morfo-quiz-opt').forEach(function(b){b.disabled=true;});
+  var ok=chosen===correct;
+  if(ok)vqCorrect++;
   btn.classList.add(ok?'correct':'wrong');
-  opts.forEach(b=>{if(b.textContent===correct)b.classList.add('correct');});
-  const fb = document.getElementById('mq-feedback');
+  document.querySelectorAll('#verbal-quiz-area .morfo-quiz-opt').forEach(function(b){if(b.textContent===correct)b.classList.add('correct');});
+  var fb=document.getElementById('vq-feedback');
   fb.className='morfo-quiz-feedback '+(ok?'ok':'err');
-  fb.textContent = ok ? '✓ Correcto' : `✗ Era: ${correct}`;
-  updateMorfoQuizScore();
-  setTimeout(()=>{morfoQuizPos++;renderMorfoQuiz();}, 1200);
+  fb.textContent=ok?'✓ Correcto':'✗ Era: '+correct;
+  updateVerbalScore();
+  setTimeout(function(){renderVerbalQuiz(vQuizPos+1);},1200);
 }
 
-// ── EMPAREJAR ──
-function initMorfoMatch(){
-  morfoMatchFirst = null; morfoMatchedPairs = 0;
-  const pool = buildMorfoCards(morfoFilter, morfoMode)
-    .filter((c,i,a)=>a.findIndex(x=>x.answer===c.answer)===i)
-    .sort(()=>Math.random()-.5).slice(0,5);
-  const lefts = pool.map((c,i)=>({id:i, type:'prompt', text:c.prompt, pair:i, answer:c.answer}));
-  const rights = pool.map((c,i)=>({id:i+100, type:'answer', text:c.answer, pair:i, greek:true}));
-  const allItems = [...lefts, ...rights].sort(()=>Math.random()-.5);
-  const grid = document.getElementById('morfo-match-grid');
-  document.getElementById('morfo-match-status').textContent = `0 / ${pool.length} pares`;
-  grid.innerHTML = allItems.map(item=>`
-    <button class="morfo-match-btn ${item.greek?'greek':''}" data-id="${item.id}" data-pair="${item.pair}" data-type="${item.type}" onclick="selectMorfoMatch(this)">
-      ${item.text}
-    </button>`).join('');
+function initVerbalMatch(){
+  verbalMatchFirst=null;verbalMatchedPairs=0;
+  var pool=buildVerbalCards(verbalFilter,verbalMode).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;}).sort(function(){return Math.random()-.5;}).slice(0,5);
+  var lefts=pool.map(function(c,i){return {id:i,type:'prompt',text:c.prompt,pair:i};});
+  var rights=pool.map(function(c,i){return {id:i+100,type:'answer',text:c.answer,pair:i,greek:true};});
+  var all=[].concat(lefts,rights).sort(function(){return Math.random()-.5;});
+  document.getElementById('verbal-match-grid').innerHTML=all.map(function(item){return '<button class="morfo-match-btn'+(item.greek?' greek':'')+'" data-id="'+item.id+'" data-pair="'+item.pair+'" data-type="'+item.type+'" onclick="selectVerbalMatch(this)">'+item.text+'</button>';}).join('');
+  document.getElementById('verbal-match-status').textContent='0 / '+pool.length+' pares';
 }
-function selectMorfoMatch(btn){
-  if(btn.classList.contains('matched')) return;
-  if(!morfoMatchFirst){
-    morfoMatchFirst = btn;
-    btn.classList.add('selected');
-    return;
-  }
-  if(morfoMatchFirst===btn){ morfoMatchFirst.classList.remove('selected'); morfoMatchFirst=null; return; }
-  const p1 = morfoMatchFirst.dataset.pair;
-  const p2 = btn.dataset.pair;
-  const t1 = morfoMatchFirst.dataset.type;
-  const t2 = btn.dataset.type;
-  if(p1===p2 && t1!==t2){
-    morfoMatchFirst.classList.remove('selected');
-    morfoMatchFirst.classList.add('matched');
-    btn.classList.add('matched');
-    morfoMatchedPairs++;
-    const pool = buildMorfoCards(morfoFilter, morfoMode).filter((c,i,a)=>a.findIndex(x=>x.answer===c.answer)===i);
-    document.getElementById('morfo-match-status').textContent = `${morfoMatchedPairs} / ${Math.min(5,pool.length)} pares`;
-    morfoMatchFirst=null;
+function selectVerbalMatch(btn){
+  if(btn.classList.contains('matched'))return;
+  if(!verbalMatchFirst){verbalMatchFirst=btn;btn.classList.add('selected');return;}
+  if(verbalMatchFirst===btn){verbalMatchFirst.classList.remove('selected');verbalMatchFirst=null;return;}
+  var p1=verbalMatchFirst.dataset.pair,p2=btn.dataset.pair,t1=verbalMatchFirst.dataset.type,t2=btn.dataset.type;
+  if(p1===p2&&t1!==t2){
+    verbalMatchFirst.classList.remove('selected');verbalMatchFirst.classList.add('matched');btn.classList.add('matched');
+    verbalMatchedPairs++;
+    var pool=buildVerbalCards(verbalFilter,verbalMode).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;});
+    document.getElementById('verbal-match-status').textContent=verbalMatchedPairs+' / '+Math.min(5,pool.length)+' pares';
+    verbalMatchFirst=null;
   } else {
-    morfoMatchFirst.classList.remove('selected');
-    morfoMatchFirst.classList.add('error');
-    btn.classList.add('error');
-    const f=morfoMatchFirst, b=btn;
-    setTimeout(()=>{f.classList.remove('error');b.classList.remove('error');},600);
-    morfoMatchFirst=null;
+    verbalMatchFirst.classList.remove('selected');verbalMatchFirst.classList.add('error');btn.classList.add('error');
+    var f=verbalMatchFirst,b=btn;setTimeout(function(){f.classList.remove('error');b.classList.remove('error');},600);verbalMatchFirst=null;
   }
 }
 
-// ── VISTA RÁPIDA ──
-function renderMorfoQuick(){
-  const area = document.getElementById('morfo-quick-area');
-  let html = '';
+function renderVerbalQuick(){
+  var area=document.getElementById('verbal-quick-area');
+  var tiempos = TIEMPO_ORDEN.filter(function(f){ return verbalFilter==='all'||verbalFilter===f; });
+  if(!tiempos.length){ area.innerHTML='<div class="empty-state">Sin contenido.</div>'; return; }
+  var voces = ['activa','media','pasiva'];
+  var html = '<div class="morfo-table-wrap"><table class="morfo-table">';
 
-  if(morfoFilter==='all'||morfoFilter==='articulo'){
-    html+=`<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma del Artículo</div>
-    <table class="morfo-table"><thead><tr><th>Caso</th><th>Masc.</th><th>Fem.</th><th>Neutro</th></tr></thead><tbody>`;
-    ARTICULO.forEach(r=>{html+=`<tr><td>${r.caso}</td><td class="greek">${r.m}</td><td class="greek">${r.f}</td><td class="greek">${r.n}</td></tr>`;});
-    html+=`</tbody></table><div class="morfo-quick-note">* El artículo concuerda en caso, género y número con el sustantivo que determina.</div></div>`;
-  }
+  // Fila de encabezado: columna vacía + un th por tiempo
+  html += '<thead><tr><th></th>';
+  tiempos.forEach(function(fname){
+    var ti = TIEMPO_IDX[fname];
+    var nota = (ti===1||ti===2) ? ' (aum.)' : ti===3 ? ' (redup.)' : '';
+    html += '<th>'+VERBAL.tiempos[ti]+nota+'</th>';
+  });
+  html += '</tr></thead><tbody>';
 
-  if(morfoFilter==='all'||morfoFilter==='1decl'||morfoFilter==='2decl'){
-    html+=`<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma de 1ª y 2ª Declinación</div>
-    <table class="morfo-table"><thead><tr><th>Caso</th><th>2ª M/F</th><th>1ª F/M</th><th>2ª Neutro</th></tr></thead><tbody>`;
-    DECL2_MF.forEach((r,i)=>{
-      html+=`<tr><td>${r.caso}</td><td class="greek">${r.des}</td><td class="greek">${DECL1[i].mf}</td><td class="greek">${DECL2_N[i].des}</td></tr>`;
-    });
-    html+=`</tbody></table><div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div></div>`;
-  }
-
-  const voces = ['activa','media','pasiva'];
-  const tiempoFiltros = {'presente':0,'aoristo':1,'imperfecto':2,'perfecto':3,'futuro':4};
-  const toShow = morfoFilter==='all' ? Object.entries(tiempoFiltros) : Object.entries(tiempoFiltros).filter(([k])=>k===morfoFilter);
-
-  if(toShow.length){
-    html+=`<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma Verbal — Modo Indicativo</div>`;
-    html+=`<table class="morfo-table"><thead><tr><th>Persona</th>`;
-    toShow.forEach(([,ti])=>{
-      voces.forEach(voz=>{
-        html+=`<th>${VERBAL.abrev[ti]} ${voz.slice(0,3)}.</th>`;
+  // Por cada voz, una fila de encabezado de voz + 6 filas de personas
+  voces.forEach(function(voz){
+    // Fila de etiqueta de voz (celda izquierda con rowspan=6, fondo navy)
+    VERBAL.personas.forEach(function(pers, pi){
+      html += '<tr>';
+      if(pi===0){
+        html += '<td rowspan="6" style="background:var(--navy);color:#fff;font-weight:600;font-size:12px;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);padding:.4rem .3rem;letter-spacing:.05em">voz '+voz+'</td>';
+      }
+      tiempos.forEach(function(fname){
+        var ti = TIEMPO_IDX[fname];
+        var des = VERBAL[voz][ti][pi];
+        var isGrey = (voz==='pasiva') && (ti!==1 && ti!==4);
+        html += '<td class="greek'+(isGrey?' grey':'')+'" style="text-align:left;padding:.35rem .6rem">';
+        html += '<span style="font-size:10px;color:var(--text-muted);font-family:Inter,sans-serif;margin-right:4px">'+pers+'</span>'+des;
+        html += '</td>';
       });
+      html += '</tr>';
     });
-    html+=`</tr></thead><tbody>`;
-    VERBAL.personas.forEach((p,pi)=>{
-      html+=`<tr><td>${p}</td>`;
-      toShow.forEach(([fname,ti])=>{
-        voces.forEach(voz=>{
-          const des=VERBAL[voz][ti][pi];
-          // Media y pasiva iguales salvo aoristo y futuro
-          const isGrey = (voz==='pasiva'||voz==='media') && (ti!==1&&ti!==4) && voz==='pasiva';
-          html+=`<td class="greek${isGrey?' grey':''}">${des}</td>`;
-        });
-      });
-      html+=`</tr>`;
-    });
-    html+=`</tbody></table>
-    <div class="morfo-quick-note">* Las voces media y pasiva son idénticas excepto en el aoristo y futuro (desinencias en gris = iguales a la media).<br>* (aum.) = aumento ε; (redup.) = reduplicación.</div></div>`;
-  }
+  });
 
-  area.innerHTML = html || '<div class="empty-state">Sin contenido para este filtro.</div>';
+  html += '</tbody></table></div>';
+  html += '<div class="morfo-quick-note">* Las voces media y pasiva tienen la misma conjugación, excepto en el aoristo y en el futuro; nótese las desinencias en gris.<br>* El aumento (ε) indica tiempo pasado (aoristo, imperfecto). La reduplicación indica perfecto.</div>';
+  area.innerHTML = html;
 }
 
 // ── INIT ──
