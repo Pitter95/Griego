@@ -187,7 +187,7 @@ body.phonetics-off .phon-hideable{display:none !important}
 .section-btn:hover:not(.active){background:var(--cream-dark)}
 
 /* MORPHOLOGY SECTION */
-#section-morfo{display:none}
+#section-morfo{}
 .morfo-status-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:.8rem;flex-wrap:wrap}
 .morfo-mode-toggle{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px}
 .morfo-mode-toggle button{padding:.3rem .7rem;border:1px solid var(--cream-border);border-radius:6px;background:#fff;font-size:12px;cursor:pointer;color:var(--text-muted);transition:all .15s}
@@ -1936,8 +1936,8 @@ function kittelNote(w){
 
 // ── SECTION SWITCHING ──
 function switchSection(s){
-  document.getElementById('section-vocab').style.display = s==='vocab' ? '' : 'none';
-  document.getElementById('section-morfo').style.display = s==='morfo' ? '' : 'none';
+  document.getElementById('section-vocab').style.display = s==='vocab' ? 'block' : 'none';
+  document.getElementById('section-morfo').style.display = s==='morfo' ? 'block' : 'none';
   document.getElementById('secbtn-vocab').classList.toggle('active', s==='vocab');
   document.getElementById('secbtn-morfo').classList.toggle('active', s==='morfo');
   if(s==='morfo'){
