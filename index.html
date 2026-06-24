@@ -2265,18 +2265,39 @@ function selectNominalMatch(btn){
 function renderNominalQuick(){
   var area=document.getElementById('nominal-quick-area');
   var html='';
+
+  // Funciones sintácticas por caso (Velardo, apunte G1)
+  var FUNC_SINT = {
+    'NS': 'sujeto / predicado nominal (atributo)',
+    'GS': 'complemento determinativo — equivale a "de + sustantivo"',
+    'DS': 'complemento indirecto — el beneficiado o destinatario de la acción',
+    'AS': 'complemento directo — el objeto sobre el que recae la acción',
+    'NP': 'sujeto / predicado nominal (atributo)',
+    'GP': 'complemento determinativo — equivale a "de + sustantivo"',
+    'DP': 'complemento indirecto — el beneficiado o destinatario de la acción',
+    'AP': 'complemento directo — el objeto sobre el que recae la acción',
+  };
+
   if(nominalFilter==='all'||nominalFilter==='articulo'){
     html+='<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma flexivo completo del artículo</div>';
-    html+='<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th></tr></thead><tbody>';
-    ARTICULO.forEach(function(r){html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td></tr>';});
+    html+='<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th><th style="text-align:left">Función sintáctica</th></tr></thead><tbody>';
+    ARTICULO.forEach(function(r){
+      var fn = FUNC_SINT[r.caso] || '';
+      html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td><td style="text-align:left;font-size:11px;color:var(--text-muted)">'+fn+'</td></tr>';
+    });
     html+='</tbody></table><div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div></div>';
   }
+
   if(nominalFilter==='all'||nominalFilter==='1decl'||nominalFilter==='2decl'){
     html+='<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma flexivo casual de 1ª y 2ª declinación</div>';
-    html+='<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>1ª Decl. F/M</th><th>2ª Decl. N</th></tr></thead><tbody>';
-    DECL2_MF.forEach(function(r,i){html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL1[i].des+'</td><td class="greek">'+DECL2_N[i].des+'</td></tr>';});
+    html+='<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>1ª Decl. F/M</th><th>2ª Decl. N</th><th style="text-align:left">Función sintáctica</th></tr></thead><tbody>';
+    DECL2_MF.forEach(function(r,i){
+      var fn = FUNC_SINT[r.caso] || '';
+      html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL1[i].des+'</td><td class="greek">'+DECL2_N[i].des+'</td><td style="text-align:left;font-size:11px;color:var(--text-muted)">'+fn+'</td></tr>';
+    });
     html+='</tbody></table><div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div></div>';
   }
+
   area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
 }
 
