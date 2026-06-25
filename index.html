@@ -11,7 +11,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
   --navy:#2A3B4C;--navy-mid:#38506A;--navy-light:#90A2B3;
-  --cream:#F0EAD6;--cream-dark:#E5E7EB;--cream-bg:#E6DDCB;--cream-border:#E5E7EB;
+  --cream:#F0EAD6;--cream-dark:#E5E7EB;--cream-bg:#F2EDE3;--cream-border:#E5E7EB;
   --gold:#B8860B;--amber:#D49B24;--amber-bg:#FBF1DC;--amber-text:#6E4E0A;
   --text-main:#2D3135;--text-muted:#5A626A;--text-hint:#A8AEB4;
   --green:#1E5E4E;--green-bg:#E4EFEA;--green-text:#143F34;
@@ -296,12 +296,12 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
 
 /* PROGRESS PANEL */
 .progress-panel{background:#fff;border:0.5px solid var(--cream-border);border-radius:12px;margin-bottom:1rem;overflow:hidden}
-.progress-panel-head{background:var(--cream-bg);padding:.65rem 1rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none}
+.progress-panel-head{background:var(--cream-bg);padding:.65rem 1rem;display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;border-bottom:0.5px solid var(--cream-border)}
 .pp-title{font-size:12px;font-weight:600;color:var(--navy);text-transform:uppercase;letter-spacing:.06em}
 .pp-toggle{font-size:11px;color:var(--text-muted)}
 .pp-body{padding:.9rem 1rem}
 .pp-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:8px;margin-bottom:1rem}
-.pp-stat{background:var(--cream-bg);border-radius:8px;padding:.6rem .8rem;text-align:center}
+.pp-stat{background:var(--cream-bg);border:0.5px solid var(--cream-border);border-radius:8px;padding:.6rem .8rem;text-align:center}
 .pp-stat-num{font-size:22px;font-weight:600;color:var(--navy)}
 .pp-stat-label{font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:.05em;margin-top:2px}
 .pp-history{border-top:0.5px solid var(--cream-border);padding-top:.8rem}
@@ -539,10 +539,10 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
 </div>
 
 <div class="tabs">
-  <button class="tab active" onclick="showTab('cards')">Tarjetas</button>
   <button class="tab" onclick="showTab('list')">Lista</button>
   <button class="tab" onclick="showTab('quiz')">Quiz</button>
   <button class="tab" onclick="showTab('match')">Emparejar</button>
+  <button class="tab active" onclick="showTab('cards')">Flashcards</button>
   <button class="tab" onclick="showTab('write')">Escritura</button>
 </div>
 
@@ -1152,7 +1152,7 @@ function selectNoneTypes(){selectedTypes.clear();renderTypeChips();buildActiveWo
 // ── TABS ──
 function showTab(t){
   ['cards','list','quiz','match','write'].forEach(x=>document.getElementById('tab-'+x).style.display=x===t?'':'none');
-  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['cards','list','quiz','match','write'][i]===t));
+  document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['list','quiz','match','cards','write'][i]===t));
   if(t==='list')renderList();else if(t==='quiz')initQuiz();else if(t==='match')restartMatch();else if(t==='write')restartWrite();
 }
 function resetAll(){
@@ -1160,7 +1160,7 @@ function resetAll(){
   writeMasterQueue=[];writeMasterPos=0;writeQueue=[];writePos=0;
   const at=[...document.querySelectorAll('.tab')].find(t=>t.classList.contains('active'));
   const idx=at?[...document.querySelectorAll('.tab')].indexOf(at):0;
-  const tabs=['cards','list','quiz','match','write'];
+  const tabs=['list','quiz','match','cards','write'];
   const t=tabs[idx]||'cards';
   if(t==='list')renderList();else if(t==='cards')initCards();else if(t==='quiz')initQuiz();else if(t==='match')restartMatch();else if(t==='write')restartWrite();
 }
