@@ -47,6 +47,7 @@ body.phonetics-off .phon-hideable{display:none !important}
 .chip{padding:4px 11px;border-radius:20px;border:0.5px solid var(--cream-border);font-size:12px;cursor:pointer;background:#fff;color:var(--text-muted);transition:all .15s;line-height:1.4}
 .chip.active-v{background:var(--navy);color:var(--cream);border-color:var(--navy)}
 .chip.active-t{background:#2d4a6e;color:var(--cream);border-color:#2d4a6e}
+.chip.active{background:var(--navy);color:var(--cream);border-color:var(--navy)}
 .chip-actions{display:flex;gap:5px;flex-wrap:wrap}
 .chip-btn{padding:3px 10px;border-radius:5px;border:0.5px solid var(--cream-border);font-size:11px;cursor:pointer;background:#fff;color:var(--text-muted)}
 .chip-btn:hover{background:var(--cream-bg)}
@@ -1952,6 +1953,8 @@ async function loadProgress(){
     }
     document.getElementById('progress-panel').style.display='';
     renderProgressPanel();
+    // Re-aplicar filtros ahora que progressData está disponible
+    if(activeWords.length) buildActiveWords();
   } catch(e){
     setSyncStatus('offline','Error al cargar');
     progressData = initProgress();
