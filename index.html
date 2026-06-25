@@ -1137,7 +1137,8 @@ function renderCard(){
       <div class="card-rev-foot">
         <span class="card-rev-type">${wcTypeLabel(w.type)}</span>
         <span class="card-rev-graminfo">${w.gi}</span>
-      </div>`;
+      </div>
+      <div class=\"morfo-classif-btns\" style=\"padding:.5rem .8rem 0\"><button class=\"morfo-classif-btn no\" onclick=\"classifyVocabCard(0)\">&#10007; No aprendida</button><button class=\"morfo-classif-btn prog\" onclick=\"classifyVocabCard(1)\">&#126; En progreso</button><button class=\"morfo-classif-btn ok\" onclick=\"classifyVocabCard(2)\">&#10003; Aprendida</button></div>`;
   } else {
     fH=`<div class="card-stripe"></div>
       <div class="card-mid">
@@ -1158,7 +1159,7 @@ function renderCard(){
         <span class="card-rev-type">${wcTypeLabel(w.type)}</span>
         <span class="card-rev-graminfo">${w.gi}</span>
       </div>
-      <div id="vocab-classif-btns"></div>`;
+      <div class=\"morfo-classif-btns\" style=\"padding:.5rem .8rem 0\"><button class=\"morfo-classif-btn no\" onclick=\"classifyVocabCard(0)\">&#10007; No aprendida</button><button class=\"morfo-classif-btn prog\" onclick=\"classifyVocabCard(1)\">&#126; En progreso</button><button class=\"morfo-classif-btn ok\" onclick=\"classifyVocabCard(2)\">&#10003; Aprendida</button></div>`;
   }
   document.getElementById('card-area').innerHTML=`
     <div class="card-wrap">
@@ -1175,18 +1176,6 @@ function renderCard(){
       <button class="card-nav-btn" onclick="nextCard()">Siguiente →</button>
     </div>
     <p class="hint-text">toca la tarjeta para ver la traducción</p>`;
-  if(cardFlipped){
-    var btnDiv = document.getElementById('vocab-classif-btns');
-    if(btnDiv){
-      var b = document.createElement('div');
-      b.className = 'morfo-classif-btns';
-      b.style.padding = '.5rem .8rem 0';
-      b.innerHTML = '<button class="morfo-classif-btn no" onclick="classifyVocabCard(0)">&#10007; No aprendida</button>'
-        + '<button class="morfo-classif-btn prog" onclick="classifyVocabCard(1)">&#126; En progreso</button>'
-        + '<button class="morfo-classif-btn ok" onclick="classifyVocabCard(2)">&#10003; Aprendida</button>';
-      btnDiv.replaceWith(b);
-    }
-  }
 }
 function flipCard(){cardFlipped=!cardFlipped;const fc=document.getElementById('flashcard');if(fc)fc.classList.toggle('flipped',cardFlipped);}
 function classifyVocabCard(level){
@@ -1197,8 +1186,11 @@ function classifyVocabCard(level){
   e.level = lvlMap[level];
   e.lastSeen = new Date().toISOString().slice(0,10);
   scheduleSave();
+  // Avanzar a la siguiente tarjeta
   cardPos = cardPos < cardQueue.length-1 ? cardPos+1 : 0;
   cardFlipped = false;
+  const fc = document.getElementById('flashcard');
+  if(fc) fc.classList.remove('flipped');
   renderCard();
 }
 function nextCard(){cardPos=cardPos<cardQueue.length-1?cardPos+1:0;cardFlipped=false;renderCard();}
