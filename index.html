@@ -1163,7 +1163,7 @@ function renderCard(){
   }
   document.getElementById('card-area').innerHTML=`
     <div class="card-wrap">
-      <div class="flashcard" id="flashcard" onclick="flipCard()">
+      <div class="flashcard${cardFlipped?' flipped':''}" id="flashcard" onclick="flipCard()">
         <div class="flashcard-inner">
           <div class="card-face card-front">${fH}</div>
           <div class="card-face card-back">${bH}</div>
@@ -1186,11 +1186,8 @@ function classifyVocabCard(level){
   e.level = lvlMap[level];
   e.lastSeen = new Date().toISOString().slice(0,10);
   scheduleSave();
-  // Avanzar a la siguiente tarjeta
   cardPos = cardPos < cardQueue.length-1 ? cardPos+1 : 0;
   cardFlipped = false;
-  const fc = document.getElementById('flashcard');
-  if(fc) fc.classList.remove('flipped');
   renderCard();
 }
 function nextCard(){cardPos=cardPos<cardQueue.length-1?cardPos+1:0;cardFlipped=false;renderCard();}
