@@ -978,7 +978,7 @@ const VOCABS={
 let filterMode='vocab',selectedVocabs=new Set(),selectedTypes=new Set(),stateFilter='all';
 let activeWords=[],listSort='vocab',listSRSFilter='all',cardMode='gr-es',quizMode='gr-es',matchSize=5,panelOpen=true;
 let ppTab='vocab';
-let cardQueue=[],cardPos=0,cardFlipped=false;
+let cardQueue=[],cardPos=0,cardFlipped=false,currentCardWord=null;
 let quizQueue=[],quizPos=0,quizAnswered=false,qCorrect=0,qTotal=0;
 let matchPairs=[],selGr=null,selEs=null,mMatched=0,mErrors=0,mStart=null;
 let writeSize=5,writeQueue=[],writePos=0,writeAnswered=false,wCorrect=0,wTotal=0;
@@ -1112,6 +1112,8 @@ function initCards(){
 }
 function renderCard(){
   const w=activeWords[cardQueue[cardPos]];
+  if(!w){ initCards(); return; }
+  currentCardWord = w;
   document.getElementById('card-prog').style.width=Math.round(cardPos/cardQueue.length*100)+'%';
   document.getElementById('card-session-info').innerHTML=
     `<span>Tarjeta <span class="badge">${cardPos+1}</span> / <span class="badge">${cardQueue.length}</span></span>
@@ -1181,9 +1183,8 @@ function renderCard(){
 }
 function flipCard(){cardFlipped=!cardFlipped;const fc=document.getElementById('flashcard');if(fc)fc.classList.toggle('flipped',cardFlipped);}
 function classifyVocabCard(level){
-  if(!progressData) return;
-  const w = activeWords[cardQueue[cardPos]];
-  const e = ensureWordEntry(w);
+  if(!progressData || !currentCardWord) return;
+  const e = ensureWordEntry(currentCardWord);
   const lvlMap = {0:0, 1:1, 2:3};
   e.level = lvlMap[level];
   e.lastSeen = new Date().toISOString().slice(0,10);
