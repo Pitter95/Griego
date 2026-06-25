@@ -139,6 +139,7 @@ body.phonetics-off .phon-hideable{display:none !important}
 .quiz-es-big{font-size:26px;font-weight:600;color:var(--navy);display:block;line-height:1.35}
 .quiz-opts{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .quiz-opts-gr{gap:10px}
+.quiz-opts .quiz-opt,.quiz-opts-gr .quiz-opt-gr{min-height:64px}
 .quiz-opt{padding:11px 13px;border:0.5px solid var(--cream-border);border-radius:10px;background:#fff;font-size:13px;cursor:pointer;text-align:left;line-height:1.4;transition:all .15s;color:var(--navy)}
 .quiz-opt-gr{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:16px 10px;text-align:center}
 .quiz-opt-greek{font-family:'SBLGreek',serif;font-size:26px;color:var(--navy);line-height:1.2}
@@ -148,13 +149,14 @@ body.phonetics-off .phon-hideable{display:none !important}
 .quiz-opt.correct .quiz-opt-greek,.quiz-opt.correct .quiz-opt-ph{color:var(--green-text)}
 .quiz-opt.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red-text)}
 .quiz-opt.wrong .quiz-opt-greek,.quiz-opt.wrong .quiz-opt-ph{color:var(--red-text)}
-.quiz-bottom{display:flex;flex-direction:column;align-items:center;gap:6px;margin-top:.8rem;min-height:80px}
+.quiz-bottom{display:flex;flex-direction:row;align-items:center;justify-content:space-between;gap:8px;margin-top:.8rem;min-height:44px}
+.quiz-bottom .quiz-feedback{flex:1;text-align:center;font-size:13px}
+.quiz-skip{padding:.45rem 1rem;border:1px solid var(--cream-border);border-radius:8px;background:#fff;color:var(--text-muted);font-size:13px;cursor:pointer;white-space:nowrap}
+.quiz-skip:hover{color:var(--text-main);background:var(--cream-dark)}
 .quiz-feedback{text-align:center;font-size:13px;color:var(--text-muted);min-height:20px}
 .quiz-next{padding:7px 28px;border-radius:8px;border:0.5px solid var(--navy);background:var(--navy);font-size:13px;cursor:pointer;color:var(--cream);transition:opacity .2s}
 .quiz-next:hover:not(:disabled){background:var(--navy-mid)}
 .quiz-next:disabled{opacity:.25;cursor:default}
-.quiz-skip{font-size:12px;color:var(--text-hint);background:none;border:none;cursor:pointer;text-decoration:underline;padding:2px}
-.quiz-skip:hover{color:var(--text-muted)}
 
 /* MATCH */
 .match-controls{display:flex;align-items:center;justify-content:space-between;margin-bottom:1rem;flex-wrap:wrap;gap:8px}
@@ -216,6 +218,16 @@ body.phonetics-off .phon-hideable{display:none !important}
 .morfo-nav button:disabled{opacity:.4;cursor:default}
 .morfo-nav-info{font-size:12px;color:var(--text-muted)}
 .morfo-flip-hint{font-size:11px;color:var(--text-hint);text-align:center;margin-bottom:.5rem}
+.morfo-classif-btns{display:flex;gap:8px;margin-top:.8rem;justify-content:center}
+.morfo-classif-btn{flex:1;max-width:130px;padding:.5rem .4rem;border-radius:8px;border:1.5px solid;font-size:12px;font-weight:500;cursor:pointer;transition:all .15s}
+.morfo-classif-btn.no{border-color:var(--red);color:var(--red-text);background:var(--red-bg)}
+.morfo-classif-btn.prog{border-color:#e6a817;color:#7a5200;background:#fff8e6}
+.morfo-classif-btn.ok{border-color:var(--green);color:var(--green-text);background:var(--green-bg)}
+.morfo-classif-btn:hover{filter:brightness(.95)}
+.morfo-level-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px;vertical-align:middle}
+.morfo-level-dot.l0{background:var(--red)}
+.morfo-level-dot.l1{background:#e6a817}
+.morfo-level-dot.l2{background:var(--green)}
 
 /* MORPHOLOGY LIST */
 .morfo-table-wrap{overflow-x:auto;margin-bottom:1rem}
@@ -446,6 +458,15 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
         <button class="chip-btn" onclick="selectNoneTypes()">Limpiar</button>
       </div>
     </div>
+    <div class="filter-section visible" id="filter-state" style="margin-top:.5rem">
+      <div style="font-size:11px;color:var(--text-muted);margin-bottom:.4rem;font-weight:500">Por estado</div>
+      <div class="chips">
+        <button class="chip state-chip active" id="sc-all"      onclick="setStateFilter('all',this)">Todas</button>
+        <button class="chip state-chip"        id="sc-weak"     onclick="setStateFilter('weak',this)">Débiles</button>
+        <button class="chip state-chip"        id="sc-progress" onclick="setStateFilter('progress',this)">En progreso</button>
+        <button class="chip state-chip"        id="sc-learned"  onclick="setStateFilter('learned',this)">Aprendidas</button>
+      </div>
+    </div>
     <hr class="filter-hr">
   </div>
 </div>
@@ -584,7 +605,7 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
   <div class="morfo-prog-bar" style="height:4px;background:var(--cream-border);border-radius:4px;margin-bottom:.6rem">
     <div id="nominal-prog-fill" style="height:4px;background:var(--navy);border-radius:4px;width:0%;transition:width .3s"></div>
   </div>
-  <div class="morfo-card-area" id="nominal-card-area" onclick="flipNominalCard()"></div>
+  <div class="morfo-card-area" id="nominal-card-area" onclick="flipNominalCard(event)"></div>
   <div class="morfo-nav">
     <button onclick="nominalCardNav(-1)">← Anterior</button>
     <span class="morfo-nav-info" id="nominal-card-info"></span>
@@ -646,7 +667,7 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
   <div class="morfo-prog-bar" style="height:4px;background:var(--cream-border);border-radius:4px;margin-bottom:.6rem">
     <div id="verbal-prog-fill" style="height:4px;background:var(--navy);border-radius:4px;width:0%;transition:width .3s"></div>
   </div>
-  <div class="morfo-card-area" id="verbal-card-area" onclick="flipVerbalCard()"></div>
+  <div class="morfo-card-area" id="verbal-card-area" onclick="flipVerbalCard(event)"></div>
   <div class="morfo-nav">
     <button onclick="verbalCardNav(-1)">← Anterior</button>
     <span class="morfo-nav-info" id="verbal-card-info"></span>
@@ -953,7 +974,7 @@ const VOCABS={
 };
 
 // ── STATE ──
-let filterMode='vocab',selectedVocabs=new Set(),selectedTypes=new Set();
+let filterMode='vocab',selectedVocabs=new Set(),selectedTypes=new Set(),stateFilter='all';
 let activeWords=[],listSort='vocab',listSRSFilter='all',cardMode='gr-es',quizMode='gr-es',matchSize=5,panelOpen=true;
 let ppTab='vocab';
 let cardQueue=[],cardPos=0,cardFlipped=false;
@@ -984,11 +1005,36 @@ const grShort=w=>{
 const buildQueue=r=>{let q=[];activeWords.forEach((_,i)=>{for(let x=0;x<r;x++)q.push(i);});return shuffle(q);};
 const allTypes=()=>{const s=new Set();Object.values(VOCABS).forEach(v=>v.words.forEach(w=>s.add(w.type)));return[...s].sort();};
 
+function setStateFilter(f, btn){
+  stateFilter = f;
+  document.querySelectorAll('.state-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  buildActiveWords();
+}
+
+function getWordLevel(w){
+  if(!progressData) return -1;
+  const e = progressData.words[wordKey(w)];
+  if(!e || e.correct+e.wrong===0) return -1;
+  return e.level;
+}
+
 function buildActiveWords(){
   activeWords=[];
   if(filterMode==='vocab') for(const v of selectedVocabs) VOCABS[v].words.forEach(w=>activeWords.push({...w,vocab:v}));
   else if(filterMode==='type') Object.keys(VOCABS).forEach(v=>VOCABS[v].words.forEach(w=>{if(selectedTypes.has(w.type))activeWords.push({...w,vocab:+v});}));
-  
+
+  // Filtro por estado de aprendizaje
+  if(stateFilter !== 'all'){
+    activeWords = activeWords.filter(w=>{
+      const lvl = getWordLevel(w);
+      if(stateFilter==='weak')     return lvl===0 || lvl===-1;
+      if(stateFilter==='progress') return lvl===1 || lvl===2;
+      if(stateFilter==='learned')  return lvl===3;
+      return true;
+    });
+  }
+
   updateSelInfo();
 }
 function updateSelInfo(){
@@ -1111,7 +1157,8 @@ function renderCard(){
       <div class="card-rev-foot">
         <span class="card-rev-type">${wcTypeLabel(w.type)}</span>
         <span class="card-rev-graminfo">${w.gi}</span>
-      </div>`;
+      </div>
+      <div id="vocab-classif-btns"></div>`;
   }
   document.getElementById('card-area').innerHTML=`
     <div class="card-wrap">
@@ -1128,8 +1175,32 @@ function renderCard(){
       <button class="card-nav-btn" onclick="nextCard()">Siguiente →</button>
     </div>
     <p class="hint-text">toca la tarjeta para ver la traducción</p>`;
+  if(cardFlipped){
+    var btnDiv = document.getElementById('vocab-classif-btns');
+    if(btnDiv){
+      var b = document.createElement('div');
+      b.className = 'morfo-classif-btns';
+      b.style.padding = '.5rem .8rem 0';
+      b.innerHTML = '<button class="morfo-classif-btn no" onclick="classifyVocabCard(0)">&#10007; No aprendida</button>'
+        + '<button class="morfo-classif-btn prog" onclick="classifyVocabCard(1)">&#126; En progreso</button>'
+        + '<button class="morfo-classif-btn ok" onclick="classifyVocabCard(2)">&#10003; Aprendida</button>';
+      btnDiv.replaceWith(b);
+    }
+  }
 }
 function flipCard(){cardFlipped=!cardFlipped;const fc=document.getElementById('flashcard');if(fc)fc.classList.toggle('flipped',cardFlipped);}
+function classifyVocabCard(level){
+  if(!progressData) return;
+  const w = activeWords[cardQueue[cardPos]];
+  const e = ensureWordEntry(w);
+  const lvlMap = {0:0, 1:1, 2:3};
+  e.level = lvlMap[level];
+  e.lastSeen = new Date().toISOString().slice(0,10);
+  scheduleSave();
+  cardPos = cardPos < cardQueue.length-1 ? cardPos+1 : 0;
+  cardFlipped = false;
+  renderCard();
+}
 function nextCard(){cardPos=cardPos<cardQueue.length-1?cardPos+1:0;cardFlipped=false;renderCard();}
 function prevCard(){if(cardPos>0)cardPos--;cardFlipped=false;renderCard();}
 
@@ -1257,9 +1328,9 @@ function renderQuiz(){
       }).join('')}
     </div>
     <div class="quiz-bottom">
+      <button class="quiz-skip" onclick="skipQuestion()">Saltar →</button>
       <div class="quiz-feedback" id="quiz-feedback">&nbsp;</div>
       <button class="quiz-next" id="quiz-next-btn" disabled onclick="advanceQuiz()">Siguiente →</button>
-      <button class="quiz-skip" onclick="skipQuestion()">Saltar (responder después)</button>
     </div>`;
 }
 function checkAnswer(btn,isCorrect,correctGr,isSyn){
@@ -1543,7 +1614,7 @@ let progressPanelOpen = false;
 function wordKey(w){ return w.gr.replace(/\s/g,'_'); }
 
 function initProgress(){
-  return { words:{}, history:[] };
+  return { words:{}, morfo:{}, history:[] };
 }
 
 function ensureWordEntry(w){
@@ -1554,6 +1625,74 @@ function ensureWordEntry(w){
   return progressData.words[k];
 }
 
+// ── MORFO PROGRESS ──
+// key: e.g. "articulo_fem_GS" or "verbal_activa_presente_1S"
+function ensureMorfoEntry(key){
+  if(!progressData) return null;
+  if(!progressData.morfo) progressData.morfo = {};
+  if(!progressData.morfo[key]){
+    progressData.morfo[key] = {level:0, lastSeen:null, timesStudied:0};
+  }
+  return progressData.morfo[key];
+}
+
+function getMorfoLevel(key){
+  if(!progressData||!progressData.morfo||!progressData.morfo[key]) return 0;
+  return progressData.morfo[key].level || 0;
+}
+
+function setMorfoLevel(key, level){
+  if(!progressData) return;
+  var e = ensureMorfoEntry(key);
+  if(!e) return;
+  var today = new Date().toISOString().slice(0,10);
+  e.level = Math.max(0, Math.min(2, level));
+  e.lastSeen = today;
+  e.timesStudied = (e.timesStudied||0) + 1;
+  scheduleSave();
+}
+
+// Decay: si lastSeen > 20 días y timesStudied < 8, retrocede un nivel
+function applyMorfoDecay(){
+  if(!progressData||!progressData.morfo) return;
+  var today = new Date();
+  Object.keys(progressData.morfo).forEach(function(key){
+    var e = progressData.morfo[key];
+    if(!e.lastSeen || e.level===0) return;
+    var last = new Date(e.lastSeen);
+    var days = Math.floor((today - last) / 86400000);
+    if(days > 20 && (e.timesStudied||0) < 8){
+      e.level = Math.max(0, e.level - 1);
+    }
+  });
+}
+
+// ── MORFO SRS WEIGHT ──
+// Nivel 0 y 1 aparecen más; nivel 2 (aprendida) menos frecuente
+function buildMorfoQueue(cards, section){
+  if(!progressData) return [...cards].sort(function(){return Math.random()-.5;});
+  var weighted = [];
+  cards.forEach(function(c){
+    var key = morfoCardKey(c, section);
+    var level = getMorfoLevel(key);
+    var times = level===2 ? 1 : level===1 ? 2 : 3;
+    for(var i=0;i<times;i++) weighted.push(c);
+  });
+  return weighted.sort(function(){return Math.random()-.5;});
+}
+
+function morfoCardKey(card, section){
+  // Create a stable key from the card prompt + section
+  return (section+'_'+card.prompt).replace(/[^a-zA-Z0-9_Ͱ-Ͽἀ-῿]/g,'_').slice(0,60);
+}
+
+// ── REGISTRAR MORFO CLASSIF ──
+// Registers Registrar result from card button (0=no aprendida, 1=en progreso, 2=aprendida)
+function classifyMorfoCard(key, level){
+  setMorfoLevel(key, level);
+}
+
+// Registra un resultado y actualiza el nivel SRS
 // Registra un resultado y actualiza el nivel SRS
 function recordResult(w, isCorrect, mode){
   if(!progressData) return;
@@ -1815,6 +1954,8 @@ async function loadProgress(){
         {headers:{'Authorization':'Bearer '+accessToken}}
       ).then(r=>r.json());
       progressData = content;
+      if(!progressData.morfo) progressData.morfo = {};
+      applyMorfoDecay();
       setSyncStatus('online','Conectado · progreso cargado');
     } else {
       progressData = initProgress();
@@ -2147,16 +2288,36 @@ function renderNominalCard(){
   var info = document.getElementById('nominal-card-info');
   var prog = document.getElementById('nominal-prog-fill');
   if(!nominalCards.length){ area.innerHTML='<div class="empty-state">Sin tarjetas para este filtro.</div>'; return; }
-  var c = nominalCards[nominalCardPos];
+  var card = nominalCards[nominalCardPos];
   prog.style.width = Math.round((nominalCardPos+1)/nominalCards.length*100)+'%';
   info.textContent = (nominalCardPos+1) + ' / ' + nominalCards.length;
+  var key = morfoCardKey(card,'nominal');
+  var lvl = getMorfoLevel(key);
+  var dot = '<span class="morfo-level-dot l'+lvl+'"></span>';
   if(!nominalCardFlipped){
-    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
+    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
   } else {
-    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-prompt">'+c.prompt+'</div>'+(c.desc?'<div class="morfo-card-desc">'+c.desc+'</div>':'')+'</div>';
+    var btns = '<div class="morfo-classif-btns">'
+      +'<button class="morfo-classif-btn no" onclick="classifyAndAdvanceNominal(0)">✗ No aprendida</button>'
+      +'<button class="morfo-classif-btn prog" onclick="classifyAndAdvanceNominal(1)">~ En progreso</button>'
+      +'<button class="morfo-classif-btn ok" onclick="classifyAndAdvanceNominal(2)">✓ Aprendida</button>'
+      +'</div>';
+    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-prompt">'+card.prompt+'</div>'+(card.desc?'<div class="morfo-card-desc">'+card.desc+'</div>':'')+btns+'</div>';
   }
 }
-function flipNominalCard(){ nominalCardFlipped=!nominalCardFlipped; renderNominalCard(); }
+function flipNominalCard(e){
+  // Don't flip if clicking a button
+  if(e && e.target && e.target.tagName==='BUTTON') return;
+  nominalCardFlipped=!nominalCardFlipped; renderNominalCard();
+}
+function classifyAndAdvanceNominal(level){
+  var card = nominalCards[nominalCardPos];
+  var key = morfoCardKey(card,'nominal');
+  classifyMorfoCard(key, level);
+  nominalCardPos = Math.min(nominalCards.length-1, nominalCardPos+1);
+  nominalCardFlipped = false;
+  renderNominalCard();
+}
 function nominalCardNav(d){ nominalCardPos=Math.max(0,Math.min(nominalCards.length-1,nominalCardPos+d)); nominalCardFlipped=false; renderNominalCard(); }
 
 function renderNominalList(){
@@ -2381,16 +2542,35 @@ function renderVerbalCard(){
   var info=document.getElementById('verbal-card-info');
   var prog=document.getElementById('verbal-prog-fill');
   if(!verbalCards.length){area.innerHTML='<div class="empty-state">Sin tarjetas.</div>';return;}
-  var c=verbalCards[verbalCardPos];
+  var card=verbalCards[verbalCardPos];
   prog.style.width=Math.round((verbalCardPos+1)/verbalCards.length*100)+'%';
   info.textContent=(verbalCardPos+1)+' / '+verbalCards.length;
+  var key=morfoCardKey(card,'verbal');
+  var lvl=getMorfoLevel(key);
+  var dot='<span class="morfo-level-dot l'+lvl+'"></span>';
   if(!verbalCardFlipped){
-    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
+    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
   } else {
-    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+c.tag+'</div><div class="morfo-card-greek">'+c.answer+'</div><div class="morfo-card-prompt">'+c.prompt+'</div>'+(c.desc?'<div class="morfo-card-desc">'+c.desc+'</div>':'')+'</div>';
+    var btns='<div class="morfo-classif-btns">'
+      +'<button class="morfo-classif-btn no" onclick="classifyAndAdvanceVerbal(0)">✗ No aprendida</button>'
+      +'<button class="morfo-classif-btn prog" onclick="classifyAndAdvanceVerbal(1)">~ En progreso</button>'
+      +'<button class="morfo-classif-btn ok" onclick="classifyAndAdvanceVerbal(2)">✓ Aprendida</button>'
+      +'</div>';
+    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-prompt">'+card.prompt+'</div>'+(card.desc?'<div class="morfo-card-desc">'+card.desc+'</div>':'')+btns+'</div>';
   }
 }
-function flipVerbalCard(){verbalCardFlipped=!verbalCardFlipped;renderVerbalCard();}
+function flipVerbalCard(e){
+  if(e&&e.target&&e.target.tagName==='BUTTON') return;
+  verbalCardFlipped=!verbalCardFlipped;renderVerbalCard();
+}
+function classifyAndAdvanceVerbal(level){
+  var card=verbalCards[verbalCardPos];
+  var key=morfoCardKey(card,'verbal');
+  classifyMorfoCard(key,level);
+  verbalCardPos=Math.min(verbalCards.length-1,verbalCardPos+1);
+  verbalCardFlipped=false;
+  renderVerbalCard();
+}
 function verbalCardNav(d){verbalCardPos=Math.max(0,Math.min(verbalCards.length-1,verbalCardPos+d));verbalCardFlipped=false;renderVerbalCard();}
 
 function renderVerbalList(){
