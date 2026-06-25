@@ -1138,7 +1138,7 @@ function renderCard(){
         <span class="card-rev-type">${wcTypeLabel(w.type)}</span>
         <span class="card-rev-graminfo">${w.gi}</span>
       </div>
-      <div class=\"morfo-classif-btns\" style=\"padding:.5rem .8rem 0\"><button class=\"morfo-classif-btn no\" onclick=\"classifyVocabCard(0)\">&#10007; No aprendida</button><button class=\"morfo-classif-btn prog\" onclick=\"classifyVocabCard(1)\">&#126; En progreso</button><button class=\"morfo-classif-btn ok\" onclick=\"classifyVocabCard(2)\">&#10003; Aprendida</button></div>`;
+      <div class=\"morfo-classif-btns\" style=\"padding:.5rem .8rem 0\"><button class=\"morfo-classif-btn no\" onclick=\"event.stopPropagation();classifyVocabCard(0)\">&#10007; No aprendida</button><button class=\"morfo-classif-btn prog\" onclick=\"event.stopPropagation();classifyVocabCard(1)\">&#126; En progreso</button><button class=\"morfo-classif-btn ok\" onclick=\"event.stopPropagation();classifyVocabCard(2)\">&#10003; Aprendida</button></div>`;
   } else {
     fH=`<div class="card-stripe"></div>
       <div class="card-mid">
@@ -1159,7 +1159,7 @@ function renderCard(){
         <span class="card-rev-type">${wcTypeLabel(w.type)}</span>
         <span class="card-rev-graminfo">${w.gi}</span>
       </div>
-      <div class=\"morfo-classif-btns\" style=\"padding:.5rem .8rem 0\"><button class=\"morfo-classif-btn no\" onclick=\"classifyVocabCard(0)\">&#10007; No aprendida</button><button class=\"morfo-classif-btn prog\" onclick=\"classifyVocabCard(1)\">&#126; En progreso</button><button class=\"morfo-classif-btn ok\" onclick=\"classifyVocabCard(2)\">&#10003; Aprendida</button></div>`;
+      <div class=\"morfo-classif-btns\" style=\"padding:.5rem .8rem 0\"><button class=\"morfo-classif-btn no\" onclick=\"event.stopPropagation();classifyVocabCard(0)\">&#10007; No aprendida</button><button class=\"morfo-classif-btn prog\" onclick=\"event.stopPropagation();classifyVocabCard(1)\">&#126; En progreso</button><button class=\"morfo-classif-btn ok\" onclick=\"event.stopPropagation();classifyVocabCard(2)\">&#10003; Aprendida</button></div>`;
   }
   document.getElementById('card-area').innerHTML=`
     <div class="card-wrap">
