@@ -1502,6 +1502,36 @@ function setPhonetics(visible){
 }
 
 // ── ESCRITURA ──────────────────────────────────────────────
+function extractMeanings(esField){
+  const out=[];
+  const regex=/\"([^\"]+)\"(\s*\([^)]+\))?/g;
+  let m;
+  const hasGreek = s => /[\u0370-\u03FF\u1F00-\u1FFF]/.test(s);
+  while((m=regex.exec(esField))!==null){
+    let meaning=m[1].trim();
+    if(m[2] && !hasGreek(m[2])) meaning += ' ' + m[2].trim();
+    out.push(meaning);
+  }
+  return out;
+}
+function normalize(s){
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[¿?¡!.,;:"']/g,'').replace(/\s+/g,' ').trim();
+}
+function meaningPresent(userNorm, meaningNorm){
+  const escaped = meaningNorm.replace(/[.*+?^${}()|[\]\\]/g,'\\$&');
+  const pattern = new RegExp('(?:^|[^a-z0-9])'+escaped+'(?:$|[^a-z0-9])');
+  return pattern.test(' '+userNorm+' ');
+}
+function checkWriteAnswer(userText, w){
+  const expected = extractMeanings(w.es);
+  const userNorm = normalize(userText);
+  const missing = [];
+  for(const exp of expected){
+    const expNorm = normalize(exp);
+    if(!meaningPresent(userNorm, expNorm)) missing.push(exp);
+  }
+  return {isCorrect: missing.length===0, missing, expected};
+}
 function restartWrite(){
   const area = document.getElementById('write-area');
   const verifyRow = document.getElementById('write-verify-row');
