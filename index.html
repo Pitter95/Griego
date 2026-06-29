@@ -643,9 +643,6 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
     <button class="restart-btn" onclick="restartWrite()">↺ Reiniciar</button>
   </div>
   <div id="write-area"></div>
-  <div id="write-verify-row" style="display:none;margin-top:1rem;text-align:center">
-    <button onclick="verifyWrite()" style="padding:.6rem 2rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.02em">Verificar</button>
-  </div>
   <div id="write-summary" style="display:none;margin-top:1rem"></div>
 </div>
 </div><!-- end section-vocab -->
@@ -1526,8 +1523,8 @@ function restartWrite(){
       +'</td>'
       +'</tr>';
   }).join('');
-  area.innerHTML='<table class="write-simulacro"><thead><tr><th>Lema</th><th>Glosa</th></tr></thead><tbody>'+rows+'</tbody></table>';
-  if(verifyRow) verifyRow.style.display='block';
+  area.innerHTML='<table class="write-simulacro"><thead><tr><th>Lema</th><th>Glosa</th></tr></thead><tbody>'+rows+'</tbody></table>'
+    +'<div style="margin-top:1rem;text-align:center"><button onclick="verifyWrite()" id="write-verify-btn" style="padding:.6rem 2rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.02em">Verificar</button></div>';
   // Focus first input
   var first = area.querySelector('input');
   if(first) first.focus();
@@ -1558,8 +1555,8 @@ function verifyWrite(){
     }
   });
   // Hide verify button, show summary
-  var verifyRow = document.getElementById('write-verify-row');
-  if(verifyRow) verifyRow.style.display='none';
+  var btn = document.getElementById('write-verify-btn');
+  if(btn) btn.style.display='none';
   var pct = Math.round(correct/total*100);
   var summary = document.getElementById('write-summary');
   if(summary){
