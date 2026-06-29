@@ -329,7 +329,26 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
 .write-type{font-size:10px;color:var(--navy);border:0.5px solid var(--navy);padding:2px 9px;border-radius:4px;text-transform:uppercase;letter-spacing:.06em;font-weight:600;display:inline-block;margin-top:8px}
 .write-input-row{margin-top:1.1rem;display:flex;flex-direction:column;gap:8px}
 .write-input{width:100%;padding:11px 13px;border-radius:10px;border:1px solid var(--cream-border);font-size:15px;font-family:'Inter',sans-serif;color:var(--navy);background:#fff}
+*{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none}
+*:focus{outline:none}
+*:focus-visible{outline:none}
 .write-input:focus{outline:none;border-color:var(--navy)}
+.write-simulacro{width:100%;border-collapse:collapse;font-size:13px;background:#fff;border-radius:12px;overflow:hidden;border:1px solid var(--cream-border);box-shadow:0 2px 8px rgba(26,46,74,.07)}
+.write-simulacro thead{background:var(--navy)}
+.write-simulacro thead th{color:#fff;font-size:11px;font-weight:600;padding:.5rem .8rem;letter-spacing:.05em;text-transform:uppercase;text-align:left}
+.write-simulacro thead th:first-child{width:42%;border-right:1px solid rgba(255,255,255,.15)}
+.write-simulacro tbody tr{border-bottom:1px solid var(--cream-border)}
+.write-simulacro tbody tr:last-child{border-bottom:none}
+.write-simulacro tbody tr:nth-child(even){background:#faf8f4}
+.write-simulacro td{padding:.5rem .8rem;vertical-align:middle}
+.write-simulacro td:first-child{width:42%;font-family:'SBLGreek',serif;font-size:17px;color:var(--navy);border-right:1px solid var(--cream-border)}
+.write-simulacro td:last-child{width:58%}
+.write-simulacro input{width:100%;border:none;background:transparent;font-size:13px;padding:.2rem .3rem;color:var(--navy);font-family:inherit}
+.write-simulacro input::placeholder{color:#bbb}
+.write-simulacro input.correct{color:var(--green-text);background:var(--green-bg);border-radius:4px;padding:.2rem .5rem}
+.write-simulacro input.wrong{color:var(--red-text);background:var(--red-bg);border-radius:4px;padding:.2rem .5rem}
+.write-expected{font-size:11px;color:var(--green-text);margin-top:3px;display:none;font-style:italic}
+.write-expected.show{display:block}
 .write-input.correct{border-color:var(--green);background:var(--green-bg);color:var(--green-text)}
 .write-input.wrong{border-color:var(--red);background:var(--red-bg);color:var(--red-text)}
 .write-submit{padding:10px;border-radius:10px;border:none;background:var(--navy);color:var(--cream);font-size:14px;font-weight:500;cursor:pointer}
@@ -542,7 +561,7 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
   <button class="tab" onclick="showTab('list')">Lista</button>
   <button class="tab" onclick="showTab('quiz')">Quiz</button>
   <button class="tab" onclick="showTab('match')">Emparejar</button>
-  <button class="tab active" onclick="showTab('cards')">Flashcards</button>
+  <button class="tab" onclick="showTab('cards')">Flashcards</button>
   <button class="tab" onclick="showTab('write')">Escritura</button>
 </div>
 
@@ -619,25 +638,15 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
 </div>
 
 <div id="tab-write" style="display:none">
-  <div class="match-controls">
-    <div class="size-toggle">
-      <button class="size-btn active" id="wsz-5"  onclick="setWriteSize(5)">5</button>
-      <button class="size-btn"        id="wsz-10" onclick="setWriteSize(10)">10</button>
-      <button class="size-btn"        id="wsz-15" onclick="setWriteSize(15)">15</button>
-      <button class="size-btn"        id="wsz-20" onclick="setWriteSize(20)">20</button>
-      <button class="size-btn"        id="wsz-25" onclick="setWriteSize(25)">25</button>
-    </div>
-    <button class="restart-btn" onclick="restartWrite()">↺ Nueva ronda</button>
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:8px">
+    <div style="font-size:13px;color:var(--text-muted)">Completá los significados y tocá <strong>Verificar</strong> al terminar.</div>
+    <button class="restart-btn" onclick="restartWrite()">↺ Reiniciar</button>
   </div>
-  <div class="score-row">
-    <div class="score-item"><div class="score-num" id="w-correct">0</div><div class="score-label">correctas</div></div>
-    <div class="score-item"><div class="score-num" id="w-total">0</div><div class="score-label">intentos</div></div>
-    <div class="score-item"><div class="score-num" id="w-pct">—</div><div class="score-label">precisión</div></div>
-    <div class="score-item"><div class="score-num" id="w-remain">—</div><div class="score-label">restantes</div></div>
-  </div>
-  <p class="write-hint">Escribí todos los significados separados por coma. No hace falta usar comillas. Las aclaraciones entre paréntesis también cuentan.</p>
-  <div class="prog-bar prog-green"><div class="prog-fill" id="write-prog" style="width:0%"></div></div>
   <div id="write-area"></div>
+  <div id="write-verify-row" style="display:none;margin-top:1rem;text-align:center">
+    <button onclick="verifyWrite()" style="padding:.6rem 2rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;letter-spacing:.02em">Verificar</button>
+  </div>
+  <div id="write-summary" style="display:none;margin-top:1rem"></div>
 </div>
 </div><!-- end section-vocab -->
 
@@ -1153,7 +1162,8 @@ function selectNoneTypes(){selectedTypes.clear();renderTypeChips();buildActiveWo
 function showTab(t){
   ['cards','list','quiz','match','write'].forEach(x=>document.getElementById('tab-'+x).style.display=x===t?'':'none');
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['list','quiz','match','cards','write'][i]===t));
-  if(t==='list')renderList();else if(t==='quiz')initQuiz();else if(t==='match')restartMatch();else if(t==='write')restartWrite();
+  setPhonetics(t==='list');
+  if(t==='cards')initCards();else if(t==='list')renderList();else if(t==='quiz')initQuiz();else if(t==='match')restartMatch();else if(t==='write')restartWrite();
 }
 function resetAll(){
   cardQueue=[];cardPos=0;cardFlipped=false;quizQueue=[];quizPos=0;qCorrect=0;qTotal=0;
@@ -1488,167 +1498,79 @@ function togglePhonetics(){
   document.getElementById('phon-toggle-label').textContent=off?'Mostrar pronunciación':'Ocultar pronunciación';
   document.getElementById('phon-toggle-btn').classList.toggle('hidden-state',off);
 }
+function setPhonetics(visible){
+  const isOff = document.body.classList.contains('phonetics-off');
+  if(visible && isOff) togglePhonetics();
+  else if(!visible && !isOff) togglePhonetics();
+}
 
 // ── ESCRITURA ──────────────────────────────────────────────
-function setWriteSize(n){
-  writeSize=n;
-  ['5','10','15','20','25'].forEach(s=>document.getElementById('wsz-'+s).classList.toggle('active',+s===n));
-  writeMasterQueue=[]; writeMasterPos=0; // tamaño cambió: reiniciar distribución
-  restartWrite();
-}
-
-// Devuelve los próximos N índices de activeWords, asegurando que el pool completo
-// se recorra antes de repetir ninguna palabra (equidad entre rondas sucesivas).
-function nextWriteBlock(n){
-  const block=[];
-  while(block.length<n){
-    if(writeMasterPos>=writeMasterQueue.length || writeMasterQueue.length!==activeWords.length){
-      writeMasterQueue=buildQueue(1); // baraja todas las palabras del pool activo
-      writeMasterPos=0;
-    }
-    block.push(writeMasterQueue[writeMasterPos]);
-    writeMasterPos++;
-  }
-  return block;
-}
-
 function restartWrite(){
+  const area = document.getElementById('write-area');
+  const verifyRow = document.getElementById('write-verify-row');
+  const summary = document.getElementById('write-summary');
   if(!activeWords.length){
-    document.getElementById('write-area').innerHTML='<div class="empty-state">Seleccioná palabras para comenzar.</div>';
-    document.getElementById('w-remain').textContent='—';
-    document.getElementById('write-prog').style.width='0%';
+    area.innerHTML='<div class="empty-state">Seleccioná palabras para comenzar.</div>';
+    if(verifyRow) verifyRow.style.display='none';
+    if(summary) summary.style.display='none';
     return;
   }
-  const n=Math.min(writeSize, activeWords.length);
-  writeQueue=nextWriteBlock(n);
-  writePos=0; wCorrect=0; wTotal=0; writeAnswered=false;
-  document.getElementById('w-correct').textContent=0;
-  document.getElementById('w-total').textContent=0;
-  document.getElementById('w-pct').textContent='—';
-  renderWrite();
+  if(summary) summary.style.display='none';
+  // Build simulacro table — all active words at once
+  var rows = activeWords.map(function(w, i){
+    return '<tr>'
+      +'<td>'+w.gr+'</td>'
+      +'<td>'
+        +'<input class="write-sim-input" data-idx="'+i+'" type="text" autocomplete="off" autocorrect="off" spellcheck="false" placeholder="significado...">'
+        +'<div class="write-expected" id="write-exp-'+i+'"></div>'
+      +'</td>'
+      +'</tr>';
+  }).join('');
+  area.innerHTML='<table class="write-simulacro"><thead><tr><th>Lema</th><th>Glosa</th></tr></thead><tbody>'+rows+'</tbody></table>';
+  if(verifyRow) verifyRow.style.display='block';
+  // Focus first input
+  var first = area.querySelector('input');
+  if(first) first.focus();
 }
 
-// Extrae todos los significados literales entre comillas, tal como figuran en el documento
-// (incluye aclaraciones entre paréntesis pegadas a una entrada, ej: "los gentiles" (pl.))
-// Las aclaraciones que contienen letras griegas (ej. "de οὐ") no se exigen literalmente,
-// porque el usuario no tiene forma práctica de tipear griego — se conservan solo para mostrarlas.
-function extractMeanings(esField){
-  const out=[];
-  const regex=/"([^"]+)"(\s*\([^)]+\))?/g;
-  let m;
-  const hasGreek = s => /[\u0370-\u03FF\u1F00-\u1FFF]/.test(s);
-  while((m=regex.exec(esField))!==null){
-    let meaning=m[1].trim();
-    if(m[2] && !hasGreek(m[2])) meaning += ' ' + m[2].trim();
-    out.push(meaning);
+function verifyWrite(){
+  var inputs = document.querySelectorAll('.write-sim-input');
+  var correct = 0, total = inputs.length;
+  inputs.forEach(function(input){
+    var idx = parseInt(input.dataset.idx);
+    var w = activeWords[idx];
+    var result = checkWriteAnswer(input.value, w);
+    input.disabled = true;
+    if(result.isCorrect){
+      input.classList.add('correct');
+      correct++;
+    } else {
+      input.classList.add('wrong');
+      // Show expected answer
+      var expDiv = document.getElementById('write-exp-'+idx);
+      if(expDiv){
+        expDiv.textContent = '✓ ' + result.expected.join(', ');
+        expDiv.classList.add('show');
+      }
+    }
+    if(progressData){
+      recordResult(w, result.isCorrect, 'write');
+    }
+  });
+  // Hide verify button, show summary
+  var verifyRow = document.getElementById('write-verify-row');
+  if(verifyRow) verifyRow.style.display='none';
+  var pct = Math.round(correct/total*100);
+  var summary = document.getElementById('write-summary');
+  if(summary){
+    summary.style.display='block';
+    summary.innerHTML='<div class="win-panel">'
+      +'<div class="win-title">'+correct+' / '+total+' correctas · '+pct+'%</div>'
+      +'<button class="win-btn primary" onclick="restartWrite()" style="margin-top:.8rem">↺ Reiniciar</button>'
+      +'</div>';
   }
-  return out;
 }
 
-function normalize(s){
-  return s
-    .toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g,'') // quita tildes
-    .replace(/[¿?¡!.,;:"']/g,'')
-    .replace(/\s+/g,' ')
-    .trim();
-}
-
-// Verifica que cada significado esperado esté presente en lo que el usuario escribió.
-// Usa coincidencia por límites de palabra (no substring puro) para evitar falsos positivos
-// como que "no" se detecte dentro de "nosotros".
-function meaningPresent(userNorm, meaningNorm){
-  const escaped = meaningNorm.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const pattern = new RegExp('(?:^|[^a-z0-9])' + escaped + '(?:$|[^a-z0-9])');
-  return pattern.test(' ' + userNorm + ' ');
-}
-
-function checkWriteAnswer(userText, w){
-  const expected = extractMeanings(w.es);
-  const userNorm = normalize(userText);
-  const missing = [];
-  for(const exp of expected){
-    const expNorm = normalize(exp);
-    if(!meaningPresent(userNorm, expNorm)) missing.push(exp);
-  }
-  return {isCorrect: missing.length===0, missing, expected};
-}
-
-function renderWrite(){
-  const area=document.getElementById('write-area');
-  if(writeQueue.length===0){
-    area.innerHTML='<div class="empty-state">No hay palabras suficientes.</div>';
-    return;
-  }
-  if(writePos>=writeQueue.length){
-    showWriteSummary();
-    return;
-  }
-  writeAnswered=false;
-  const w=activeWords[writeQueue[writePos]];
-  document.getElementById('w-remain').textContent=writeQueue.length-writePos;
-  document.getElementById('write-prog').style.width=Math.round(writePos/writeQueue.length*100)+'%';
-  area.innerHTML=`
-    <div class="write-card">
-      <div class="write-greek">${grShort(w)}</div>
-      <div class="write-phonetic phon-hideable">[ ${w.fn} ]</div>
-      <div class="write-type">${wcTypeLabel(w.type)}</div>
-    </div>
-    <div class="write-input-row">
-      <input type="text" class="write-input" id="write-input" placeholder="Escribí el/los significado(s) en español, separados por coma" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <button class="write-submit" id="write-submit-btn" onclick="submitWrite()">Comprobar</button>
-    </div>
-    <div id="write-feedback-area"></div>
-    <button class="write-next" id="write-next-btn" disabled onclick="advanceWrite()">Siguiente →</button>`;
-  const inp=document.getElementById('write-input');
-  inp.focus();
-  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitWrite(); } });
-}
-
-function submitWrite(){
-  if(writeAnswered) return;
-  const inp=document.getElementById('write-input');
-  const val=inp.value.trim();
-  if(!val) return;
-  writeAnswered=true; wTotal++;
-  const w=activeWords[writeQueue[writePos]];
-  const result=checkWriteAnswer(val, w);
-  inp.disabled=true;
-  document.getElementById('write-submit-btn').disabled=true;
-  const fbArea=document.getElementById('write-feedback-area');
-  if(result.isCorrect){
-    wCorrect++;
-    inp.classList.add('correct');
-    fbArea.innerHTML=`<div class="write-feedback-box ok"><div class="wf-label">Correcto</div>Incluiste todos los significados: <span class="wf-answer">${result.expected.map(e=>'"'+e+'"').join(', ')}</span></div>`;
-  } else {
-    inp.classList.add('wrong');
-    fbArea.innerHTML=`<div class="write-feedback-box bad"><div class="wf-label">Incompleto / incorrecto</div>Significado(s) completo(s) requerido(s): <span class="wf-answer">${result.expected.map(e=>'"'+e+'"').join(', ')}</span><br>Te faltó: <span class="wf-answer">${result.missing.map(e=>'"'+e+'"').join(', ')}</span></div>`;
-  }
-  recordResult(w, result.isCorrect, 'escritura');
-  document.getElementById('w-correct').textContent=wCorrect;
-  document.getElementById('w-total').textContent=wTotal;
-  document.getElementById('w-pct').textContent=Math.round(wCorrect/wTotal*100)+'%';
-  document.getElementById('write-next-btn').disabled=false;
-}
-
-function advanceWrite(){
-  writePos++;
-  renderWrite();
-}
-
-function showWriteSummary(){
-  const pct = wTotal>0 ? Math.round(wCorrect/wTotal*100) : 0;
-  document.getElementById('write-prog').style.width='100%';
-  document.getElementById('w-remain').textContent=0;
-  document.getElementById('write-area').innerHTML=`
-    <div class="win-panel">
-      <div class="win-title">Ronda completa</div>
-      <div class="win-sub">${wCorrect} / ${wTotal} correctas · ${pct}% precisión</div>
-      <div>
-        <button class="win-btn primary" onclick="restartWrite()">Otra ronda igual</button>
-      </div>
-    </div>`;
-}
 
 // ══════════════════════════════════════════════════════════════
 // GOOGLE DRIVE INTEGRATION + SRS + PROGRESS
@@ -2379,41 +2301,6 @@ function classifyAndAdvanceNominal(level){
 }
 function nominalCardNav(d){ nominalCardPos=Math.max(0,Math.min(nominalCards.length-1,nominalCardPos+d)); nominalCardFlipped=false; renderNominalCard(); }
 
-function renderNominalList(){
-  var area = document.getElementById('nominal-list-content');
-  var html = '';
-
-  if(nominalFilter==='all'||nominalFilter==='articulo'){
-    html += '<div class="morfo-paradigm-title">Paradigma flexivo completo del artículo</div>';
-    html += '<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th></tr></thead><tbody>';
-    ARTICULO.forEach(function(r){
-      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td></tr>';
-    });
-    html += '</tbody></table>';
-    html += '<div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div>';
-  }
-
-  if(nominalFilter==='all'||nominalFilter==='1decl'){
-    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 1ª Declinación (F/M)</div>';
-    html += '<table class="morfo-table"><thead><tr><th></th><th>1ª Decl.</th></tr></thead><tbody>';
-    DECL1.forEach(function(r){
-      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td></tr>';
-    });
-    html += '</tbody></table>';
-  }
-
-  if(nominalFilter==='all'||nominalFilter==='2decl'){
-    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 2ª Declinación</div>';
-    html += '<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>2ª Decl. N</th></tr></thead><tbody>';
-    DECL2_MF.forEach(function(r,i){
-      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL2_N[i].des+'</td></tr>';
-    });
-    html += '</tbody></table>';
-    html += '<div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div>';
-  }
-
-  area.innerHTML = html || '<div class="empty-state">Sin contenido.</div>';
-}
 
 function initNominalQuiz(){
   nominalCards = buildNominalCards(nominalFilter);
@@ -2632,37 +2519,7 @@ function classifyAndAdvanceVerbal(level){
 }
 function verbalCardNav(d){verbalCardPos=Math.max(0,Math.min(verbalCards.length-1,verbalCardPos+d));verbalCardFlipped=false;renderVerbalCard();}
 
-function renderVerbalList(){
-  var area=document.getElementById('verbal-list-content');
-  var html='';
-  TIEMPO_ORDEN.forEach(function(fname){
-    if(verbalFilter!=='all'&&verbalFilter!==fname)return;
-    var ti=TIEMPO_IDX[fname];
-    VOCES.forEach(function(voz){
-      html+='<div class="morfo-paradigm-title">Ind. '+VERBAL.tiempos[ti]+' — Voz '+voz+'</div>';
-      html+='<table class="morfo-table"><thead><tr><th>Persona</th><th>Desinencia</th>';
-      if(verbalMode==='conj') html+='<th>λύω (ej.)</th>';
-      html+='</tr></thead><tbody>';
-      VERBAL.personas.forEach(function(p,pi){
-        var des=VERBAL[voz][ti][pi];
-        var cleanDes=des.replace(/‑/g,'').replace(/\(ν\)/,'ν');
-        var conj=CONJ_STEMS[voz][ti]+cleanDes;
-        // Media y pasiva idénticas excepto aoristo(1) y futuro(4)
-        var isGrey=(voz==='pasiva')&&(ti!==1&&ti!==4);
-        html+='<tr><td>'+p+'</td><td class="greek'+(isGrey?' grey':'')+'">'+des+'</td>';
-        if(verbalMode==='conj') html+='<td class="greek">'+conj+'</td>';
-        html+='</tr>';
-      });
-      html+='</tbody></table>';
-    });
-  });
-  if(verbalFilter==='all'||verbalFilter==='aoristo'||verbalFilter==='futuro'){
-    html+='<div class="morfo-quick-note">* Las voces media y pasiva tienen la misma conjugación, excepto en el aoristo y en el futuro (marcadas en gris las iguales a la media).<br>* El aumento (ε) indica tiempo pasado. La reduplicación indica perfecto.</div>';
-  }
-  area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
-}
 
-var vQuizPos=0, vQuizQueue=[];
 function initVerbalQuiz(){
   verbalCards=buildVerbalCards(verbalFilter,verbalMode);
   vqCorrect=0;vqTotal=0;vQuizQueue=[];
@@ -2769,7 +2626,12 @@ function renderVerbalQuick(){
 }
 
 // ── INIT ──
-renderVocabChips();renderTypeChips();initCards();
+renderVocabChips();renderTypeChips();
+// Ocultar todos los tabs — el usuario elige
+['cards','list','quiz','match','write'].forEach(x=>{
+  const el=document.getElementById('tab-'+x);
+  if(el) el.style.display='none';
+});
 
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
