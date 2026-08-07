@@ -2131,6 +2131,1098 @@ async function loadProgress(){
 // ── WORD KEY ──
 function wordKey(w){ return w.gr.replace(/\s/g,'_'); }
 
+function ensureWordEntry(w){
+  const k = wordKey(w);
+  if(!progressData.words[k]){
+    progressData.words[k] = {correct:0, wrong:0, streak:0, lastSeen:null, level:0};
+  }
+  return progressData.words[k];
+}
+
+function recordResult(w, isCorrect, mode){
+  if(!progressData) return;
+  const e = ensureWordEntry(w);
+  const today = new Date().toISOString().slice(0,10);
+  e.lastSeen = today;
+  if(isCorrect){
+    e.correct++;
+    e.streak++;
+    e.level = Math.min(3, Math.floor(Math.log2(e.streak+1)));
+  } else {
+    e.wrong++;
+    e.streak = 0;
+    e.level = Math.max(0, e.level - 1);
+  }
+  // historial diario
+  let day = progressData.history.find(d=>d.date===today);
+  if(!day){
+    day = {date:today, correct:0, wrong:0, modes:[]};
+    progressData.history.unshift(day);
+    if(progressData.history.length>30) progressData.history.pop();
+  }
+  if(isCorrect) day.correct++; else day.wrong++;
+  if(!day.modes.includes(mode)) day.modes.push(mode);
+  // guardar con debounce
+  scheduleSave();
+}
+
+// ── SRS: ajusta la probabilidad de aparición según nivel ──
+// Palabras nivel 0 (nuevas) o 1 (débiles) tienen el doble de peso
+function buildSRSQueue(){
+  if(!progressData) return buildQueue(1);
+  const weighted=[];
+  activeWords.forEach((_,i)=>{
+    const w=activeWords[i];
+    const e=progressData.words[wordKey(w)];
+    const level=e?e.level:0;
+    const reps = level<=1 ? 2 : 1; // débiles/nuevas aparecen el doble
+    for(let r=0;r<reps;r++) weighted.push(i);
+  });
+  return shuffle(weighted);
+}
+
+// ── SRS badge ──
+function srsBadge(w){
+  if(!progressData) return '';
+  const e=progressData.words[wordKey(w)];
+  if(!e||e.correct+e.wrong===0) return '<span class="srs-badge srs-new">Nueva</span>';
+  if(e.level===0) return '<span class="srs-badge srs-weak">Débil</span>';
+  if(e.level===1) return '<span class="srs-badge srs-ok">En progreso</span>';
+  return '<span class="srs-badge srs-strong">Aprendida</span>';
+}
+
+// ── Panel de progreso ──
+function toggleProgressPanel(){
+  progressPanelOpen=!progressPanelOpen;
+  document.getElementById('pp-body').style.display=progressPanelOpen?'':'none';
+  document.getElementById('pp-toggle').textContent=progressPanelOpen?'▲ ocultar':'▼ ver';
+  if(progressPanelOpen) renderProgressPanel();
+}
+
+function setPPTab(t){
+  ppTab=t;
+  ['vocab','words','history'].forEach(x=>{
+    document.getElementById('pptab-'+x).classList.toggle('active',x===t);
+    document.getElementById('pp-'+x+'-view').style.display=x===t?'':'none';
+  });
+  renderPPTab();
+}
+
+function renderProgressPanel(){
+  if(!progressData) return;
+  // ── Resumen global ──
+  const allEntries=Object.values(progressData.words);
+  const seenEntries=allEntries.filter(e=>e.correct+e.wrong>0);
+  const strong=allEntries.filter(e=>e.level===3&&e.correct+e.wrong>0).length;
+  const inprog=allEntries.filter(e=>(e.level===1||e.level===2)&&e.correct+e.wrong>0).length;
+  const weak=allEntries.filter(e=>e.level===0&&e.correct+e.wrong>0).length;
+  const unseen=250-seenEntries.length;
+  const totalC=allEntries.reduce((a,e)=>a+e.correct,0);
+  const totalW=allEntries.reduce((a,e)=>a+e.wrong,0);
+  const acc=totalC+totalW>0?Math.round(totalC/(totalC+totalW)*100):0;
+  document.getElementById('pp-grid').innerHTML=`
+    <div class="pp-stat"><div class="pp-stat-num" style="color:var(--green)">${strong}</div><div class="pp-stat-label">Aprendidas</div></div>
+    <div class="pp-stat"><div class="pp-stat-num" style="color:#D49B24">${inprog}</div><div class="pp-stat-label">En progreso</div></div>
+    <div class="pp-stat"><div class="pp-stat-num" style="color:var(--red)">${weak}</div><div class="pp-stat-label">Débiles</div></div>
+    <div class="pp-stat"><div class="pp-stat-num" style="color:#aaa">${unseen}</div><div class="pp-stat-label">Sin ver</div></div>
+    <div class="pp-stat"><div class="pp-stat-num">${totalC+totalW}</div><div class="pp-stat-label">Respuestas</div></div>
+    <div class="pp-stat"><div class="pp-stat-num">${acc}%</div><div class="pp-stat-label">Precisión</div></div>`;
+  renderPPTab();
+}
+
+function renderPPTab(){
+  if(!progressData) return;
+  if(ppTab==='vocab') renderPPVocab();
+  else if(ppTab==='words') renderPPWords();
+  else renderPPHistory();
+}
+
+function renderPPVocab(){
+  const el=document.getElementById('pp-vocab-view');
+  // collect all 250 words grouped by vocab
+  let html=`<div class="pp-bar-legend" style="margin-bottom:.8rem">
+    <div class="pp-legend-item"><div class="pp-legend-dot" style="background:var(--green)"></div>Aprendida</div>
+    <div class="pp-legend-item"><div class="pp-legend-dot" style="background:#D49B24"></div>En progreso</div>
+    <div class="pp-legend-item"><div class="pp-legend-dot" style="background:var(--red);opacity:.7"></div>Débil</div>
+    <div class="pp-legend-item"><div class="pp-legend-dot" style="background:#ccc"></div>Sin ver</div>
+  </div>`;
+  Object.keys(VOCABS).forEach(vk=>{
+    const words=VOCABS[vk].words;
+    const n=words.length;
+    let strong=0,ok=0,weak=0,unseen=0;
+    words.forEach(w=>{
+      const e=progressData.words[wordKey(w)];
+      if(!e||e.correct+e.wrong===0) unseen++;
+      else if(e.level===3) strong++;
+      else if(e.level>=1) ok++;
+      else weak++;
+    });
+    const pStrong=Math.round(strong/n*100);
+    const pOk=Math.round(ok/n*100);
+    const pWeak=Math.round(weak/n*100);
+    const pUnseen=100-pStrong-pOk-pWeak;
+    html+=`<div class="pp-vocab-row">
+      <div class="pp-vocab-label">
+        <span class="pp-vocab-name">${VOCABS[vk].label}</span>
+        <span class="pp-vocab-count">${strong+ok} / ${n} · ${Math.round((strong+ok)/n*100)}%</span>
+      </div>
+      <div class="pp-bar-track">
+        <div class="pp-bar-strong" style="width:${pStrong}%"></div>
+        <div class="pp-bar-ok" style="width:${pOk}%"></div>
+        <div class="pp-bar-weak" style="width:${pWeak}%"></div>
+        <div class="pp-bar-new" style="width:${pUnseen}%"></div>
+      </div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function renderPPWords(filter='all'){
+  const el=document.getElementById('pp-words-view');
+  // gather all 250 words with their progress
+  const allWords=[];
+  Object.keys(VOCABS).forEach(vk=>{
+    VOCABS[vk].words.forEach(w=>{
+      const e=progressData.words[wordKey(w)]||{correct:0,wrong:0,streak:0,level:0};
+      allWords.push({w,e,vocab:+vk});
+    });
+  });
+  // sort by most problematic first (lowest accuracy with at least 1 attempt)
+  const seen=allWords.filter(x=>x.e.correct+x.e.wrong>0);
+  const unseen=allWords.filter(x=>x.e.correct+x.e.wrong===0);
+  seen.sort((a,b)=>{
+    const accA=a.e.correct/(a.e.correct+a.e.wrong);
+    const accB=b.e.correct/(b.e.correct+b.e.wrong);
+    return accA-accB; // worst first
+  });
+  const sorted=[...seen,...unseen];
+  if(sorted.length===0){el.innerHTML='<div class="pp-no-data">Sin datos aún.</div>';return;}
+  let html=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:.6rem">Ordenadas de más débil a más fuerte · ${seen.length} estudiadas de 250</div>
+  <table class="pp-word-table">
+    <thead><tr>
+      <th>Palabra</th><th>Vocab.</th><th>Nivel</th><th>✓ / ✗</th><th>Racha</th>
+    </tr></thead><tbody>`;
+  sorted.forEach(({w,e,vocab})=>{
+    const total=e.correct+e.wrong;
+    const acc=total>0?Math.round(e.correct/total*100):'—';
+    const lbl=total===0?'Nueva':e.level===0?'Débil':e.level<=2?'Progreso':'Aprendida';
+    const lblColor=total===0?'#aaa':e.level===0?'var(--red)':e.level<=2?'#D49B24':'var(--green)';
+    html+=`<tr>
+      <td><span class="pp-word-greek">${grShort(w)}</span></td>
+      <td style="color:var(--text-muted);font-size:11px">${vocab}</td>
+      <td><span style="font-size:11px;font-weight:600;color:${lblColor}">${lbl}</span></td>
+      <td><span class="pp-num-ok">✓${e.correct}</span> <span class="pp-num-bad">✗${e.wrong}</span></td>
+      <td style="font-size:11px;color:var(--text-muted)">${e.streak||0}</td>
+    </tr>`;
+  });
+  html+='</tbody></table>';
+  el.innerHTML=html;
+}
+
+function renderPPHistory(){
+  const el=document.getElementById('pp-history-view');
+  const hist=progressData.history.slice(0,30);
+  if(hist.length===0){el.innerHTML='<div class="pp-no-data">Sin actividad registrada aún.</div>';return;}
+  let html=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:.6rem">Últimos 30 días de actividad</div>`;
+  hist.forEach(d=>{
+    const total=d.correct+d.wrong;
+    const acc=total>0?Math.round(d.correct/total*100):0;
+    const pct=acc;
+    html+=`<div class="pp-day" style="flex-direction:column;align-items:flex-start;gap:4px;padding:6px 0">
+      <div style="display:flex;justify-content:space-between;width:100%;align-items:center">
+        <span class="pp-day-date">${d.date}</span>
+        <div class="pp-day-stats">
+          <span class="pp-day-ok">✓ ${d.correct}</span>
+          <span class="pp-day-bad">✗ ${d.wrong}</span>
+          <span style="font-size:11px;color:var(--text-muted);margin-left:4px">${acc}%</span>
+        </div>
+      </div>
+      <div style="height:4px;width:100%;background:var(--cream-dark);border-radius:2px;overflow:hidden">
+        <div style="height:100%;width:${pct}%;background:var(--green);border-radius:2px"></div>
+      </div>
+      ${d.modes&&d.modes.length?`<div style="font-size:10px;color:var(--text-hint)">Modos: ${d.modes.join(', ')}</div>`:''}
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+// ── DRIVE: save / load ──
+
+
+async function saveProgress(){
+  if(!accessToken||!progressData) return;
+  setSyncStatus('syncing','Guardando...');
+  try {
+    const body = JSON.stringify(progressData);
+    if(progressFileId){
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${progressFileId}?uploadType=media`,{
+        method:'PATCH',
+        headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+        body
+      });
+    } else {
+      // crear archivo
+      const meta = await fetch('https://www.googleapis.com/drive/v3/files',{
+        method:'POST',
+        headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+        body:JSON.stringify({name:FILE_NAME,parents:['appDataFolder']})
+      }).then(r=>r.json());
+      progressFileId = meta.id;
+      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${progressFileId}?uploadType=media`,{
+        method:'PATCH',
+        headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
+        body
+      });
+    }
+    setSyncStatus('online','Guardado en Drive');
+  } catch(e){
+    setSyncStatus('offline','Error al guardar');
+  }
+}
+
+async function loadProgress(){
+  setSyncStatus('syncing','Cargando progreso...');
+  try {
+    // buscar archivo existente
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${FILE_NAME}'&fields=files(id,name)`,
+      {headers:{'Authorization':'Bearer '+accessToken}}
+    ).then(r=>r.json());
+    if(res.files&&res.files.length>0){
+      progressFileId = res.files[0].id;
+      const content = await fetch(
+        `https://www.googleapis.com/drive/v3/files/${progressFileId}?alt=media`,
+        {headers:{'Authorization':'Bearer '+accessToken}}
+      ).then(r=>r.json());
+      progressData = content;
+      if(!progressData.morfo) progressData.morfo = {};
+      applyMorfoDecay();
+      setSyncStatus('online','Conectado · progreso cargado');
+    } else {
+      progressData = initProgress();
+      setSyncStatus('online','Conectado · nuevo progreso creado');
+    }
+    document.getElementById('progress-panel').style.display='';
+    renderProgressPanel();
+    // Re-aplicar filtros ahora que progressData está disponible
+    if(activeWords.length) buildActiveWords();
+  } catch(e){
+    setSyncStatus('offline','Error al cargar');
+    progressData = initProgress();
+  }
+}
+
+// ── AUTH ──
+let reconnectTimer = null;
+
+function initGoogleAuth(){
+  if(!window.google) return;
+  tokenClient = google.accounts.oauth2.initTokenClient({
+    client_id: CLIENT_ID,
+    scope: SCOPES,
+    prompt: '',
+    callback: async (resp) => {
+      if(reconnectTimer){ clearTimeout(reconnectTimer); reconnectTimer=null; }
+      if(resp.error){
+        // error_subtype 'access_denied' o 'user_logged_out' → limpiar flag
+        // otros errores → mantener flag para reintentar la próxima vez
+        if(resp.error==='access_denied'||resp.error==='user_logged_out'){
+          localStorage.removeItem('griego_drive_authorized');
+        }
+        setSyncStatus('offline','Sin conexión con Drive');
+        document.getElementById('sync-btn').textContent='Conectar con Google Drive';
+        document.getElementById('sync-btn').classList.remove('signout');
+        document.getElementById('sync-btn').onclick=handleAuthClick;
+        return;
+      }
+      accessToken = resp.access_token;
+      localStorage.setItem('griego_drive_authorized','1');
+      document.getElementById('sync-btn').textContent='Desconectar';
+      document.getElementById('sync-btn').classList.add('signout');
+      document.getElementById('sync-btn').onclick=handleSignOut;
+      await loadProgress();
+    }
+  });
+  // Si el usuario ya autorizó antes, reconectar silenciosamente sin popup
+  if(localStorage.getItem('griego_drive_authorized')==='1'){
+    setSyncStatus('syncing','Reconectando con Drive...');
+    setTimeout(()=>{
+      tokenClient.requestAccessToken({prompt:''});
+    }, 800);
+    // Fallback: si a los 10 segundos no hubo respuesta del callback,
+    // volver a estado offline sin borrar el flag
+    reconnectTimer = setTimeout(()=>{
+      reconnectTimer = null;
+      if(!accessToken){
+        setSyncStatus('offline','Sin conexión con Drive');
+        document.getElementById('sync-btn').textContent='Conectar con Google Drive';
+        document.getElementById('sync-btn').classList.remove('signout');
+        document.getElementById('sync-btn').onclick=handleAuthClick;
+      }
+    }, 10000);
+  }
+}
+
+function handleAuthClick(){
+  if(!tokenClient){ setSyncStatus('offline','Google no disponible'); return; }
+  // Si ya autorizó antes, intentar silencioso primero
+  if(localStorage.getItem('griego_drive_authorized')==='1'){
+    setSyncStatus('syncing','Reconectando con Drive...');
+    tokenClient.requestAccessToken({prompt:''});
+    // Si en 5 segundos no responde, mostrar popup de consentimiento
+    reconnectTimer = setTimeout(()=>{
+      reconnectTimer = null;
+      if(!accessToken){
+        tokenClient.requestAccessToken({prompt:'consent'});
+      }
+    }, 5000);
+  } else {
+    tokenClient.requestAccessToken({prompt:'consent'});
+  }
+}
+
+function handleSignOut(){
+  if(accessToken) google.accounts.oauth2.revoke(accessToken);
+  accessToken=null; progressFileId=null; progressData=null;
+  localStorage.removeItem('griego_drive_authorized');
+  document.getElementById('sync-btn').textContent='Conectar con Google Drive';
+  document.getElementById('sync-btn').classList.remove('signout');
+  document.getElementById('sync-btn').onclick=handleAuthClick;
+  document.getElementById('progress-panel').style.display='none';
+  setSyncStatus('offline','Sin conexión con Drive');
+}
+
+function setSyncStatus(state, label){
+  const dot=document.getElementById('sync-dot');
+  dot.className='sync-dot '+state;
+  document.getElementById('sync-label').textContent=label;
+}
+
+window.addEventListener('load', ()=>{
+  const wait = setInterval(()=>{
+    if(window.google&&window.google.accounts){
+      clearInterval(wait);
+      initGoogleAuth();
+    }
+  }, 200);
+});
+
+// Renovar token automáticamente cada 50 min para evitar que expire durante el estudio
+setInterval(()=>{
+  if(tokenClient && localStorage.getItem('griego_drive_authorized')==='1'){
+    tokenClient.requestAccessToken({prompt:''});
+  }
+}, 50 * 60 * 1000);
+
+
+// ── NOTAS TEOLÓGICAS (Kittel TDNT Compendio) ──
+// Fuente: Kittel, Bromiley et al., Compendio del Diccionario Teológico del NT
+// Las glosas de estudio siguen siendo las de Velardo. Estas notas son material
+// de profundización opcional, no evaluable en el curso.
+const KITTEL = {
+  "ἀγάπη, ἡ":        { nota: "ἀγάπη, a diferencia de ἔρως (amor apasionado) y φιλέω (amor afectuoso), denota un amor que elige libremente su objeto, activo y sin buscar el propio bien. En el NT recibe un contenido nuevo y pleno a partir del amor de Dios manifestado en Cristo.", ref: "E. Stauffer, Kittel TDNT compendio I, pp. 13–55" },
+  "ἀγαπάω":          { nota: "ἀγαπάω es el verbo de ἀγάπη: amor que elige y se entrega sin buscar retorno. Es el término preferido en el NT para el amor de Dios y el amor cristiano al prójimo.", ref: "E. Stauffer, Kittel TDNT compendio I, pp. 13–55" },
+  "βασιλεία, ἡ":     { nota: "βασιλεία designa primariamente el reinado o soberanía de Dios, no un territorio. En Jesús el reino irrumpe desde Dios; el propio Jesús es la autobasileia (reino en persona).", ref: "K. G. Kuhn, Kittel TDNT compendio I, pp. 86–105" },
+  "ἁμαρτία, ἡ":      { nota: "ἁμαρτία (lit. 'fallar el blanco') expresa en el NT la culpa moral y la oposición consciente a Dios. Pablo la trata como poder que esclaviza a toda la humanidad desde Adán (Ro 5–7).", ref: "G. Stählin / W. Grundmann, Kittel TDNT compendio I, pp. 55–57" },
+  "λόγος, ὁ":        { nota: "λόγος en el NT designa el discurso divino concreto que Dios dirige a los hombres. A diferencia del logos griego (principio racional cósmico), el λόγος del NT es personal, histórico y encarnado (Jn 1:14).", ref: "H. Kleinknecht / O. Procksch, Kittel TDNT compendio IV, pp. 77–100" },
+  "ζωή, ἡ":          { nota: "ζωή en el NT trasciende la vitalidad física: designa la vida que Dios da en Cristo, que comienza aquí y se extiende a la eternidad. Juan y Pablo la asocian con el Espíritu y la resurrección.", ref: "R. Bultmann, Kittel TDNT compendio II (ver parte 2)" },
+  "αἰών, -ῶνος, ὁ":  { nota: "αἰών significa tanto 'eternidad' como 'eón/mundo presente'. El NT opone 'este eón' (dominado por el pecado) al 'eón venidero' (reino de Dios). La fórmula 'por los siglos de los siglos' enfatiza la eternidad de Dios y de Cristo.", ref: "G. Delling, Kittel TDNT compendio I, pp. 39–40" },
+  "ἐξουσία, ἡ":      { nota: "ἐξουσία denota la potestad para actuar, dada por Dios. En el NT se aplica al poder de Dios, a la autoridad otorgada a Cristo (Mt 28:18) y a la libertad dada a los creyentes.", ref: "W. Foerster, Kittel TDNT compendio II, p. 190" },
+  "ῥῆμα, -ατος, τό": { nota: "ῥῆμα designa el enunciado concreto y específico, a diferencia de λόγος que es más amplio. En el NT ambos son casi sinónimos, aunque ῥῆμα enfatiza más el acto concreto de hablar.", ref: "A. Debrunner, Kittel TDNT compendio IV, pp. 69–77" },
+  "ἐκβάλλω":         { nota: "ἐκβάλλω se usa especialmente para la expulsión de demonios. Jesús lo hace con una sola palabra (Mt 8:16), señal de su soberanía y de la irrupción del reino (Mt 12:28).", ref: "F. Hauck, Kittel TDNT compendio I, pp. 526–529" },
+  "βάλλω":           { nota: "βάλλω/ἐκβάλλω: el uso de ἐκβάλλω para expulsar demonios subraya la soberanía de Jesús y la irrupción del reino de Dios (Mt 12:28).", ref: "F. Hauck, Kittel TDNT compendio I, pp. 526–529" },
+  "ζωή, ἡ":          { nota: "ζωή en el NT es la vida dada por Dios y vivida delante de él, no una sustancia inmortal del alma. En los sinópticos se conserva perdiéndola por Jesús (Mc 8:35). En Juan, el creyente ya la tiene ahora, pero llega a su plenitud en la resurrección. Pablo distingue ζωή (vida individual) de πνεῦμα (continuidad del don de Dios).", ref: "E. Schweitzer, Kittel TDNT compendio IX, pp. 637–656" },
+  "πνεῦμα, -ατος, τό": { nota: "πνεῦμα es en el NT persona divina, no sustancia cósmica. Es el poder que genera la fe (1 Co 2:6ss) y une a los creyentes con Cristo. Actúa en la proclamación y configura la vida del pueblo de Dios. Complementa a ζωή: πνεῦμα enfatiza la continuidad de la acción de Dios; ζωή, la vida individual del creyente.", ref: "H. Kleinknecht / E. Schweitzer, Kittel TDNT compendio VI, pp. 332–359" },
+  "χάρις, -ιτος, ἡ":  { nota: "χάρις en Pablo es el don gratuito de Dios que salva al pecador sin mérito (Ro 3:24; Gá 2:21). Es el estado en que se vive (Ro 5:2), la base de la justificación y el poder que vence el pecado (Ro 5:20–21). La fórmula epistolar 'gracia y paz' resume toda la salvación: χάρις es su fundamento, εἰρήνη su resultado.", ref: "H. Conzelmann, Kittel TDNT compendio IX, pp. 1029–1031" },
+  "πίστις, -εως, ἡ":  { nota: "πίστις no es una disposición psicológica sino la aceptación del mensaje de la cruz y resurrección (Ro 10:9). En Pablo se opone a las obras de la ley: la fe es entrega a Dios y su gracia, no mérito. Es a la vez acto (conversión) y estado (vida en Cristo), y puede ser débil o fuerte (Ro 14:1).", ref: "R. Bultmann, Kittel TDNT compendio VI, pp. 657–658" },
+  "σωτηρία, ἡ":       { nota: "σωτηρία en Pablo es principalmente escatológica: salvación del juicio final (Ro 5:9). Su contenido positivo es ser conformado a la imagen del Hijo (Ro 8:29). Abarca a la persona entera. En los sinópticos σῴζω incluye también curaciones, señalando que la salvación alcanza al cuerpo entero.", ref: "W. Foerster, Kittel TDNT compendio VII, pp. 1113–1116" },
+  "σῴζω":             { nota: "σῴζω ('rescatar/preservar') abarca a la persona entera. En los Sinópticos Jesús salva corporalmente (curaciones) y espiritualmente (Lc 7:50). Pablo restringe el uso al sentido escatológico: salvación de la ira divina y conformación a la imagen del Hijo.", ref: "W. Foerster, Kittel TDNT compendio VII, pp. 1113–1116" },
+  "πληρόω":           { nota: "πληρόω/πλήρης denotan en el NT 'rica plenitud' como dotación divina. El Logos encarnado está lleno de gracia y verdad (Jn 1:14). En Pablo y en Colosenses, la plenitud (πλήρωμα) de Dios habita en Cristo corporalmente (Col 2:9), y la meta del crecimiento cristiano es ser llenos de esa plenitud (Ef 3:19).", ref: "G. Delling, Kittel TDNT compendio VI, pp. 846ss" },
+  "ὄνομα, -ατος, τό": { nota: "ὄνομα en el NT expresa la persona y su autoridad, no solo el nombre propio. Bautizarse 'en el nombre de Jesús' significa entrar bajo su señorío. Hacer milagros 'en su nombre' es actuar en su autoridad delegada (Mc 9:39; Hch 3:6). El nombre de Dios resume su ser y su voluntad revelada.", ref: "H. Bietenhard, Kittel TDNT compendio V" },
+  "εἰρήνη, ἡ":        { nota: "εἰρήνη trasciende la paz política. En Pablo designa la reconciliación con Dios lograda por Cristo (Ro 5:1). En Juan, Jesús da una paz que 'el mundo no puede dar' (Jn 14:27). La fórmula epistolar 'gracia y paz' recapitula la salvación: χάρις es su fundamento, εἰρήνη su resultado.", ref: "W. Foerster, Kittel TDNT compendio II" },
+};
+
+function kittelNote(w){
+  // busca por lema completo primero, luego por forma base
+  const k = KITTEL[w.gr] || KITTEL[w.gr.split(',')[0].trim()];
+  if(!k) return '';
+  return `<div class="kittel-note">
+    <span class="kittel-icon">📖</span>
+    <div class="kittel-body">
+      <div class="kittel-text">${k.nota}</div>
+      <div class="kittel-ref">${k.ref}</div>
+    </div>
+  </div>`;
+}
+
+function applyMorfoDecay(){
+  if(!progressData||!progressData.morfo) return;
+  var today = new Date();
+  Object.keys(progressData.morfo).forEach(function(key){
+    var e = progressData.morfo[key];
+    if(!e.lastSeen || e.level===0) return;
+    var last = new Date(e.lastSeen);
+    var days = Math.floor((today - last) / 86400000);
+    if(days > 20 && (e.timesStudied||0) < 8){
+      e.level = Math.max(0, e.level - 1);
+    }
+  });
+}
+
+// ── MORFO SRS WEIGHT ──
+// Nivel 0 y 1 aparecen más; nivel 2 (aprendida) menos frecuente
+
+// ── SECTION SWITCHING ──
+function switchSection(s){
+  ['vocab','nominal','verbal'].forEach(function(x){
+    document.getElementById('section-'+x).style.display = x===s ? 'block' : 'none';
+    document.getElementById('secbtn-'+x).classList.toggle('active', x===s);
+  });
+  if(s==='nominal') initNominal();
+  if(s==='verbal') initVerbal();
+}
+
+// ══════════════════════════════════════════
+// DATOS MORFOLÓGICOS (Velardo, GEGNT G1)
+// ══════════════════════════════════════════
+
+// Artículo (orden del apunte: NS GS DS AS NP GP DP AP)
+var ARTICULO = [
+  {caso:'NS', m:'ὁ',    f:'ἡ',    n:'τό'},
+  {caso:'GS', m:'τοῦ',  f:'τῆς',  n:'τοῦ'},
+  {caso:'DS', m:'τῷ',   f:'τῇ',   n:'τῷ'},
+  {caso:'AS', m:'τόν',  f:'τήν',  n:'τό'},
+  {caso:'NP', m:'οἱ',   f:'αἱ',   n:'τά'},
+  {caso:'GP', m:'τῶν',  f:'τῶν',  n:'τῶν'},
+  {caso:'DP', m:'τοῖς', f:'ταῖς', n:'τοῖς'},
+  {caso:'AP', m:'τούς', f:'τάς',  n:'τά'},
+];
+
+// 1ª Declinación (F/M) — orden del apunte
+var DECL1 = [
+  {caso:'NS', des:'‑α / ‑η'},
+  {caso:'GS', des:'‑ας / ‑ης'},
+  {caso:'DS', des:'‑ᾳ / ‑ῃ'},
+  {caso:'AS', des:'‑αν / ‑ην'},
+  {caso:'NP', des:'‑αι'},
+  {caso:'GP', des:'‑ων'},
+  {caso:'DP', des:'‑αις'},
+  {caso:'AP', des:'‑ας'},
+];
+
+// 2ª Declinación — orden del apunte
+var DECL2_MF = [
+  {caso:'NS', des:'‑ος'}, {caso:'GS', des:'‑ου'}, {caso:'DS', des:'‑ῳ'}, {caso:'AS', des:'‑ον'},
+  {caso:'NP', des:'‑οι'}, {caso:'GP', des:'‑ων'}, {caso:'DP', des:'‑οις'}, {caso:'AP', des:'‑ους'},
+];
+var DECL2_N = [
+  {caso:'NS', des:'‑ον'}, {caso:'GS', des:'‑ου'}, {caso:'DS', des:'‑ῳ'}, {caso:'AS', des:'‑ον'},
+  {caso:'NP', des:'‑α'},  {caso:'GP', des:'‑ων'}, {caso:'DP', des:'‑οις'}, {caso:'AP', des:'‑α'},
+];
+
+// Verbal — exactamente el orden de Velardo:
+// Presente · Aoristo · Imperfecto · Perfecto · Futuro
+var VERBAL = {
+  personas: ['1S','2S','3S','1P','2P','3P'],
+  tiempos:  ['Presente','Aoristo','Imperfecto','Perfecto','Futuro'],
+  abrev:    ['pte.','aor.','imperf.','pto.','fto.'],
+  activa: [
+    ['‑ω','‑εις','‑ει','‑ομεν','‑ετε','‑ουσι(ν)'],
+    ['‑σα','‑σας','‑σε(ν)','‑σαμεν','‑σατε','‑σαν'],
+    ['‑ον','‑ες','‑ε(ν)','‑ομεν','‑ετε','‑ον'],
+    ['‑κα','‑κας','‑κε(ν)','‑καμεν','‑κατε','‑κασι(ν)'],
+    ['‑σω','‑σεις','‑σει','‑σομεν','‑σετε','‑σουσι(ν)'],
+  ],
+  media: [
+    ['‑ομαι','‑ῃ','‑εται','‑ομεθα','‑εσθε','‑ονται'],
+    ['‑σαμην','‑σω','‑σατο','‑σαμεθα','‑σασθε','‑σαντο'],
+    ['‑ομην','‑ου','‑ετο','‑ομεθα','‑εσθε','‑οντο'],
+    ['‑μαι','‑σαι','‑ται','‑μεθα','‑σθε','‑νται'],
+    ['‑σομαι','‑σῃ','‑σεται','‑σομεθα','‑σεσθε','‑σονται'],
+  ],
+  pasiva: [
+    ['‑ομαι','‑ῃ','‑εται','‑ομεθα','‑εσθε','‑ονται'],
+    ['‑θην','‑θης','‑θη','‑θημεν','‑θητε','‑θησαν'],
+    ['‑ομην','‑ου','‑ετο','‑ομεθα','‑εσθε','‑οντο'],
+    ['‑μαι','‑σαι','‑ται','‑μεθα','‑σθε','‑νται'],
+    ['‑θησομαι','‑θησῃ','‑θησεται','‑θησομεθα','‑θησεσθε','‑θησονται'],
+  ],
+};
+
+// Stems λύω para formas conjugadas
+var CONJ_STEMS = {
+  activa:  ['λυ','ἐλυσ','ἐλυ','λελυκ','λυσ'],
+  media:   ['λυ','ἐλυσ','ἐλυ','λελυ','λυσ'],
+  pasiva:  ['λυ','ἐλυθ','ἐλυ','λελυ','λυθησ'],
+};
+
+// ══════════════════════════════════════════
+// SECCIÓN NOMINAL
+// ══════════════════════════════════════════
+var nominalFilter = 'all';
+var nominalTab = 'cards';
+var nominalCards = [];
+var nominalCardPos = 0;
+var nominalCardFlipped = false;
+var nqCorrect = 0, nqTotal = 0;
+var nominalMatchFirst = null, nominalMatchedPairs = 0;
+
+function buildNominalCards(filter){
+  var cards = [];
+
+  if(filter==='all' || filter==='articulo'){
+    var genLabels = {m:'masc.',f:'fem.',n:'neutro'};
+    ARTICULO.forEach(function(r){
+      ['m','f','n'].forEach(function(g){
+        cards.push({
+          tag:'Artículo',
+          prompt:'Artículo ' + genLabels[g] + ' — ' + r.caso,
+          answer: r[g],
+          desc:''
+        });
+      });
+    });
+  }
+
+  if(filter==='all' || filter==='1decl'){
+    DECL1.forEach(function(r){
+      cards.push({
+        tag:'1ª Declinación',
+        prompt:'1ª Decl. — ' + r.caso,
+        answer: r.des,
+        desc:'Sustantivos femeninos (y algunos masc.)'
+      });
+    });
+  }
+
+  if(filter==='all' || filter==='2decl'){
+    DECL2_MF.forEach(function(r){
+      cards.push({
+        tag:'2ª Decl. M/F',
+        prompt:'2ª Decl. Masc./Fem. — ' + r.caso,
+        answer: r.des,
+        desc:'Ej.: ὁ λόγος'
+      });
+    });
+    DECL2_N.forEach(function(r){
+      cards.push({
+        tag:'2ª Decl. Neutro',
+        prompt:'2ª Decl. Neutro — ' + r.caso,
+        answer: r.des,
+        desc:'Ej.: τὸ ἔργον'
+      });
+    });
+  }
+
+  return cards;
+}
+
+function initNominal(){
+  nominalCards = buildNominalCards(nominalFilter);
+  nominalCardPos = 0; nominalCardFlipped = false;
+  showNominalTab(nominalTab);
+}
+
+function setNominalFilter(f, btn){
+  nominalFilter = f;
+  document.querySelectorAll('#section-nominal .morfo-filter-chip').forEach(function(b){ b.classList.remove('active'); });
+  btn.classList.add('active');
+  initNominal();
+}
+
+function showNominalTab(t){
+  nominalTab = t;
+  ['cards','quiz','match','quick'].forEach(function(x){
+    document.getElementById('ntab-'+x+'-content').style.display = x===t ? 'block' : 'none';
+    document.getElementById('ntab-'+x).classList.toggle('active', x===t);
+  });
+  nominalCards = buildNominalCards(nominalFilter);
+  if(t==='cards') renderNominalCard();
+  else if(t==='quiz') initNominalQuiz();
+  else if(t==='match') initNominalMatch();
+  else if(t==='quick') renderNominalQuick();
+}
+
+function renderNominalCard(){
+  var area = document.getElementById('nominal-card-area');
+  var info = document.getElementById('nominal-card-info');
+  var prog = document.getElementById('nominal-prog-fill');
+  if(!nominalCards.length){ area.innerHTML='<div class="empty-state">Sin tarjetas para este filtro.</div>'; return; }
+  var card = nominalCards[nominalCardPos];
+  prog.style.width = Math.round((nominalCardPos+1)/nominalCards.length*100)+'%';
+  info.textContent = (nominalCardPos+1) + ' / ' + nominalCards.length;
+  var key = morfoCardKey(card,'nominal');
+  var lvl = getMorfoLevel(key);
+  var dot = '<span class="morfo-level-dot l'+lvl+'"></span>';
+  if(!nominalCardFlipped){
+    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
+  } else {
+    var btns = '<div class="morfo-classif-btns">'
+      +'<button class="morfo-classif-btn no" onclick="classifyAndAdvanceNominal(0)">✗ No aprendida</button>'
+      +'<button class="morfo-classif-btn prog" onclick="classifyAndAdvanceNominal(1)">~ En progreso</button>'
+      +'<button class="morfo-classif-btn ok" onclick="classifyAndAdvanceNominal(2)">✓ Aprendida</button>'
+      +'</div>';
+    area.innerHTML = '<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-prompt">'+card.prompt+'</div>'+(card.desc?'<div class="morfo-card-desc">'+card.desc+'</div>':'')+btns+'</div>';
+  }
+}
+function flipNominalCard(e){
+  // Don't flip if clicking a button
+  if(e && e.target && e.target.tagName==='BUTTON') return;
+  nominalCardFlipped=!nominalCardFlipped; renderNominalCard();
+}
+function classifyAndAdvanceNominal(level){
+  var card = nominalCards[nominalCardPos];
+  var key = morfoCardKey(card,'nominal');
+  classifyMorfoCard(key, level);
+  nominalCardPos = Math.min(nominalCards.length-1, nominalCardPos+1);
+  nominalCardFlipped = false;
+  renderNominalCard();
+}
+function nominalCardNav(d){ nominalCardPos=Math.max(0,Math.min(nominalCards.length-1,nominalCardPos+d)); nominalCardFlipped=false; renderNominalCard(); }
+
+function renderNominalList(){
+  var area = document.getElementById('nominal-list-content');
+  var html = '';
+
+  if(nominalFilter==='all'||nominalFilter==='articulo'){
+    html += '<div class="morfo-paradigm-title">Paradigma flexivo completo del artículo</div>';
+    html += '<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th></tr></thead><tbody>';
+    ARTICULO.forEach(function(r){
+      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div>';
+  }
+
+  if(nominalFilter==='all'||nominalFilter==='1decl'){
+    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 1ª Declinación (F/M)</div>';
+    html += '<table class="morfo-table"><thead><tr><th></th><th>1ª Decl.</th></tr></thead><tbody>';
+    DECL1.forEach(function(r){
+      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td></tr>';
+    });
+    html += '</tbody></table>';
+  }
+
+  if(nominalFilter==='all'||nominalFilter==='2decl'){
+    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 2ª Declinación</div>';
+    html += '<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>2ª Decl. N</th></tr></thead><tbody>';
+    DECL2_MF.forEach(function(r,i){
+      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL2_N[i].des+'</td></tr>';
+    });
+    html += '</tbody></table>';
+    html += '<div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div>';
+  }
+
+  area.innerHTML = html || '<div class="empty-state">Sin contenido.</div>';
+}
+
+function initNominalQuiz(){
+  nominalCards = buildNominalCards(nominalFilter);
+  nqCorrect=0; nqTotal=0;
+  updateNominalScore();
+  renderNominalQuiz(0);
+}
+function updateNominalScore(){
+  document.getElementById('nq-correct').textContent=nqCorrect;
+  document.getElementById('nq-total').textContent=nqTotal;
+  document.getElementById('nq-pct').textContent=nqTotal?Math.round(nqCorrect/nqTotal*100)+'%':'—';
+}
+var nQuizPos = 0;
+var nQuizQueue = [];
+function renderNominalQuiz(pos){
+  nQuizPos = pos;
+  var area = document.getElementById('nominal-quiz-area');
+  if(!nQuizQueue.length || pos===0){ nQuizQueue=[...nominalCards].sort(function(){return Math.random()-.5;}); }
+  if(pos>=nQuizQueue.length){
+    area.innerHTML='<div style="text-align:center;padding:2rem"><div style="font-size:24px">✓</div><div style="font-weight:600;color:var(--navy);margin:.5rem 0">Ronda completada</div><div style="color:var(--text-muted);font-size:13px">'+nqCorrect+' / '+nqTotal+' correctas</div><button onclick="initNominalQuiz()" style="margin-top:1rem;padding:.5rem 1.5rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Nueva ronda</button></div>';
+    return;
+  }
+  var c = nQuizQueue[pos];
+  var pool = nominalCards.filter(function(x){return x.answer!==c.answer;}).map(function(x){return x.answer;});
+  var wrongs = pool.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(){return Math.random()-.5;}).slice(0,3);
+  var opts = [c.answer].concat(wrongs).sort(function(){return Math.random()-.5;});
+  area.innerHTML='<div class="morfo-quiz-q"><div class="morfo-quiz-q-label">'+c.tag+'</div><div class="morfo-quiz-q-greek">'+c.prompt+'</div></div><div class="morfo-quiz-opts">'+opts.map(function(o){return '<button class="morfo-quiz-opt" onclick="checkNominalQuiz(\''+o+'\',\''+c.answer+'\',this)">'+o+'</button>';}).join('')+'</div><div id="nq-feedback"></div>';
+}
+function checkNominalQuiz(chosen,correct,btn){
+  nqTotal++;
+  document.querySelectorAll('#nominal-quiz-area .morfo-quiz-opt').forEach(function(b){b.disabled=true;});
+  var ok=chosen===correct;
+  if(ok)nqCorrect++;
+  btn.classList.add(ok?'correct':'wrong');
+  document.querySelectorAll('#nominal-quiz-area .morfo-quiz-opt').forEach(function(b){if(b.textContent===correct)b.classList.add('correct');});
+  var fb=document.getElementById('nq-feedback');
+  fb.className='morfo-quiz-feedback '+(ok?'ok':'err');
+  fb.textContent=ok?'✓ Correcto':'✗ Era: '+correct;
+  updateNominalScore();
+  setTimeout(function(){renderNominalQuiz(nQuizPos+1);},1200);
+}
+
+function initNominalMatch(){
+  nominalMatchFirst=null; nominalMatchedPairs=0;
+  var pool=buildNominalCards(nominalFilter).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;}).sort(function(){return Math.random()-.5;}).slice(0,5);
+  var lefts=pool.map(function(c,i){return {id:i,type:'prompt',text:c.prompt,pair:i};});
+  var rights=pool.map(function(c,i){return {id:i+100,type:'answer',text:c.answer,pair:i,greek:true};});
+  var all=[].concat(lefts,rights).sort(function(){return Math.random()-.5;});
+  document.getElementById('nominal-match-grid').innerHTML=all.map(function(item){return '<button class="morfo-match-btn'+(item.greek?' greek':'')+'" data-id="'+item.id+'" data-pair="'+item.pair+'" data-type="'+item.type+'" onclick="selectNominalMatch(this)">'+item.text+'</button>';}).join('');
+  document.getElementById('nominal-match-status').textContent='0 / '+pool.length+' pares';
+}
+function selectNominalMatch(btn){
+  if(btn.classList.contains('matched'))return;
+  if(!nominalMatchFirst){nominalMatchFirst=btn;btn.classList.add('selected');return;}
+  if(nominalMatchFirst===btn){nominalMatchFirst.classList.remove('selected');nominalMatchFirst=null;return;}
+  var p1=nominalMatchFirst.dataset.pair,p2=btn.dataset.pair,t1=nominalMatchFirst.dataset.type,t2=btn.dataset.type;
+  if(p1===p2&&t1!==t2){
+    nominalMatchFirst.classList.remove('selected');nominalMatchFirst.classList.add('matched');btn.classList.add('matched');
+    nominalMatchedPairs++;
+    var pool=buildNominalCards(nominalFilter).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;});
+    document.getElementById('nominal-match-status').textContent=nominalMatchedPairs+' / '+Math.min(5,pool.length)+' pares';
+    nominalMatchFirst=null;
+  } else {
+    nominalMatchFirst.classList.remove('selected');nominalMatchFirst.classList.add('error');btn.classList.add('error');
+    var f=nominalMatchFirst,b=btn;setTimeout(function(){f.classList.remove('error');b.classList.remove('error');},600);nominalMatchFirst=null;
+  }
+}
+
+function renderNominalQuick(){
+  var area=document.getElementById('nominal-quick-area');
+  var html='';
+
+  // Funciones sintácticas por caso (Velardo, apunte G1)
+  var FUNC_SINT = {
+    'NS': 'sujeto / predicado nominal (atributo)',
+    'GS': 'complemento determinativo — equivale a "de + sustantivo"',
+    'DS': 'complemento indirecto — el beneficiado o destinatario de la acción',
+    'AS': 'complemento directo — el objeto sobre el que recae la acción',
+    'NP': 'sujeto / predicado nominal (atributo)',
+    'GP': 'complemento determinativo — equivale a "de + sustantivo"',
+    'DP': 'complemento indirecto — el beneficiado o destinatario de la acción',
+    'AP': 'complemento directo — el objeto sobre el que recae la acción',
+  };
+
+  if(nominalFilter==='all'||nominalFilter==='articulo'){
+    html+='<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma flexivo completo del artículo</div>';
+    html+='<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th><th style="text-align:left">Función sintáctica</th></tr></thead><tbody>';
+    ARTICULO.forEach(function(r){
+      var fn = FUNC_SINT[r.caso] || '';
+      html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td><td style="text-align:left;font-size:11px;color:var(--text-muted)">'+fn+'</td></tr>';
+    });
+    html+='</tbody></table><div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div></div>';
+  }
+
+  if(nominalFilter==='all'||nominalFilter==='1decl'||nominalFilter==='2decl'){
+    html+='<div class="morfo-quick-section"><div class="morfo-quick-title">Paradigma flexivo casual de 1ª y 2ª declinación</div>';
+    html+='<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>1ª Decl. F/M</th><th>2ª Decl. N</th><th style="text-align:left">Función sintáctica</th></tr></thead><tbody>';
+    DECL2_MF.forEach(function(r,i){
+      var fn = FUNC_SINT[r.caso] || '';
+      html+='<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL1[i].des+'</td><td class="greek">'+DECL2_N[i].des+'</td><td style="text-align:left;font-size:11px;color:var(--text-muted)">'+fn+'</td></tr>';
+    });
+    html+='</tbody></table><div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div></div>';
+  }
+
+  area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
+}
+
+// ══════════════════════════════════════════
+// SECCIÓN VERBAL
+// ══════════════════════════════════════════
+var verbalMode = 'des';
+var verbalFilter = 'all';
+var verbalTab = 'cards';
+var verbalCards = [];
+var verbalCardPos = 0;
+var verbalCardFlipped = false;
+var vqCorrect = 0, vqTotal = 0;
+var verbalMatchFirst = null, verbalMatchedPairs = 0;
+
+var TIEMPO_ORDEN = ['presente','aoristo','imperfecto','perfecto','futuro'];
+var TIEMPO_IDX   = {presente:0,aoristo:1,imperfecto:2,perfecto:3,futuro:4};
+var VOCES = ['activa','media','pasiva'];
+
+function buildVerbalCards(filter, mode){
+  var cards = [];
+  var isConj = mode==='conj';
+  TIEMPO_ORDEN.forEach(function(fname){
+    if(filter!=='all' && filter!==fname) return;
+    var ti = TIEMPO_IDX[fname];
+    VOCES.forEach(function(voz){
+      VERBAL.personas.forEach(function(pers,pi){
+        var des = VERBAL[voz][ti][pi];
+        var cleanDes = des.replace(/‑/g,'').replace(/\(ν\)/,'ν');
+        var answer = isConj ? (CONJ_STEMS[voz][ti]+cleanDes) : des;
+        var prompt = isConj
+          ? ('¿Qué forma es '+answer+'? (λύω, '+voz+')')
+          : ('Ind. '+VERBAL.abrev[ti]+' '+voz+' — '+pers);
+        cards.push({
+          tag: VERBAL.tiempos[ti]+' '+voz,
+          prompt: prompt,
+          answer: answer,
+          desc: isConj ? ('Ind. '+VERBAL.abrev[ti]+' '+voz+' '+pers) : ''
+        });
+      });
+    });
+  });
+  return cards;
+}
+
+function initVerbal(){
+  verbalCards = buildVerbalCards(verbalFilter, verbalMode);
+  verbalCardPos=0; verbalCardFlipped=false;
+  showVerbalTab(verbalTab);
+}
+
+function setVerbalMode(m){
+  verbalMode=m;
+  document.getElementById('verbal-mode-des').classList.toggle('active',m==='des');
+  document.getElementById('verbal-mode-conj').classList.toggle('active',m==='conj');
+  initVerbal();
+}
+
+function setVerbalFilter(f,btn){
+  verbalFilter=f;
+  document.querySelectorAll('#section-verbal .morfo-filter-chip').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  initVerbal();
+}
+
+function showVerbalTab(t){
+  verbalTab=t;
+  ['cards','quiz','match','quick'].forEach(function(x){
+    document.getElementById('vtab-'+x+'-content').style.display=x===t?'block':'none';
+    document.getElementById('vtab-'+x).classList.toggle('active',x===t);
+  });
+  verbalCards=buildVerbalCards(verbalFilter,verbalMode);
+  if(t==='cards') renderVerbalCard();
+  else if(t==='quiz') initVerbalQuiz();
+  else if(t==='match') initVerbalMatch();
+  else if(t==='quick') renderVerbalQuick();
+}
+
+function renderVerbalCard(){
+  var area=document.getElementById('verbal-card-area');
+  var info=document.getElementById('verbal-card-info');
+  var prog=document.getElementById('verbal-prog-fill');
+  if(!verbalCards.length){area.innerHTML='<div class="empty-state">Sin tarjetas.</div>';return;}
+  var card=verbalCards[verbalCardPos];
+  prog.style.width=Math.round((verbalCardPos+1)/verbalCards.length*100)+'%';
+  info.textContent=(verbalCardPos+1)+' / '+verbalCards.length;
+  var key=morfoCardKey(card,'verbal');
+  var lvl=getMorfoLevel(key);
+  var dot='<span class="morfo-level-dot l'+lvl+'"></span>';
+  if(!verbalCardFlipped){
+    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-hint">Tocá para revelar</div></div>';
+  } else {
+    var btns='<div class="morfo-classif-btns">'
+      +'<button class="morfo-classif-btn no" onclick="classifyAndAdvanceVerbal(0)">✗ No aprendida</button>'
+      +'<button class="morfo-classif-btn prog" onclick="classifyAndAdvanceVerbal(1)">~ En progreso</button>'
+      +'<button class="morfo-classif-btn ok" onclick="classifyAndAdvanceVerbal(2)">✓ Aprendida</button>'
+      +'</div>';
+    area.innerHTML='<div class="morfo-card"><div class="morfo-card-tag">'+dot+card.tag+'</div><div class="morfo-card-greek">'+card.answer+'</div><div class="morfo-card-prompt">'+card.prompt+'</div>'+(card.desc?'<div class="morfo-card-desc">'+card.desc+'</div>':'')+btns+'</div>';
+  }
+}
+function flipVerbalCard(e){
+  if(e&&e.target&&e.target.tagName==='BUTTON') return;
+  verbalCardFlipped=!verbalCardFlipped;renderVerbalCard();
+}
+function classifyAndAdvanceVerbal(level){
+  var card=verbalCards[verbalCardPos];
+  var key=morfoCardKey(card,'verbal');
+  classifyMorfoCard(key,level);
+  verbalCardPos=Math.min(verbalCards.length-1,verbalCardPos+1);
+  verbalCardFlipped=false;
+  renderVerbalCard();
+}
+function verbalCardNav(d){verbalCardPos=Math.max(0,Math.min(verbalCards.length-1,verbalCardPos+d));verbalCardFlipped=false;renderVerbalCard();}
+
+function renderVerbalList(){
+  var area=document.getElementById('verbal-list-content');
+  var html='';
+  TIEMPO_ORDEN.forEach(function(fname){
+    if(verbalFilter!=='all'&&verbalFilter!==fname)return;
+    var ti=TIEMPO_IDX[fname];
+    VOCES.forEach(function(voz){
+      html+='<div class="morfo-paradigm-title">Ind. '+VERBAL.tiempos[ti]+' — Voz '+voz+'</div>';
+      html+='<table class="morfo-table"><thead><tr><th>Persona</th><th>Desinencia</th>';
+      if(verbalMode==='conj') html+='<th>λύω (ej.)</th>';
+      html+='</tr></thead><tbody>';
+      VERBAL.personas.forEach(function(p,pi){
+        var des=VERBAL[voz][ti][pi];
+        var cleanDes=des.replace(/‑/g,'').replace(/\(ν\)/,'ν');
+        var conj=CONJ_STEMS[voz][ti]+cleanDes;
+        // Media y pasiva idénticas excepto aoristo(1) y futuro(4)
+        var isGrey=(voz==='pasiva')&&(ti!==1&&ti!==4);
+        html+='<tr><td>'+p+'</td><td class="greek'+(isGrey?' grey':'')+'">'+des+'</td>';
+        if(verbalMode==='conj') html+='<td class="greek">'+conj+'</td>';
+        html+='</tr>';
+      });
+      html+='</tbody></table>';
+    });
+  });
+  if(verbalFilter==='all'||verbalFilter==='aoristo'||verbalFilter==='futuro'){
+    html+='<div class="morfo-quick-note">* Las voces media y pasiva tienen la misma conjugación, excepto en el aoristo y en el futuro (marcadas en gris las iguales a la media).<br>* El aumento (ε) indica tiempo pasado. La reduplicación indica perfecto.</div>';
+  }
+  area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
+}
+
+var vQuizPos=0, vQuizQueue=[];
+function initVerbalQuiz(){
+  verbalCards=buildVerbalCards(verbalFilter,verbalMode);
+  vqCorrect=0;vqTotal=0;vQuizQueue=[];
+  updateVerbalScore();renderVerbalQuiz(0);
+}
+function updateVerbalScore(){
+  document.getElementById('vq-correct').textContent=vqCorrect;
+  document.getElementById('vq-total').textContent=vqTotal;
+  document.getElementById('vq-pct').textContent=vqTotal?Math.round(vqCorrect/vqTotal*100)+'%':'—';
+}
+function renderVerbalQuiz(pos){
+  vQuizPos=pos;
+  var area=document.getElementById('verbal-quiz-area');
+  if(!vQuizQueue.length||pos===0){vQuizQueue=[...verbalCards].sort(function(){return Math.random()-.5;});}
+  if(pos>=vQuizQueue.length){
+    area.innerHTML='<div style="text-align:center;padding:2rem"><div style="font-size:24px">✓</div><div style="font-weight:600;color:var(--navy);margin:.5rem 0">Ronda completada</div><div style="color:var(--text-muted);font-size:13px">'+vqCorrect+' / '+vqTotal+' correctas</div><button onclick="initVerbalQuiz()" style="margin-top:1rem;padding:.5rem 1.5rem;background:var(--navy);color:#fff;border:none;border-radius:8px;font-size:13px;cursor:pointer">Nueva ronda</button></div>';
+    return;
+  }
+  var c=vQuizQueue[pos];
+  var pool=verbalCards.filter(function(x){return x.answer!==c.answer;}).map(function(x){return x.answer;});
+  var wrongs=pool.filter(function(v,i,a){return a.indexOf(v)===i;}).sort(function(){return Math.random()-.5;}).slice(0,3);
+  var opts=[c.answer].concat(wrongs).sort(function(){return Math.random()-.5;});
+  area.innerHTML='<div class="morfo-quiz-q"><div class="morfo-quiz-q-label">'+c.tag+'</div><div class="morfo-quiz-q-greek">'+c.prompt+'</div></div><div class="morfo-quiz-opts">'+opts.map(function(o){return '<button class="morfo-quiz-opt" onclick="checkVerbalQuiz(\''+o+'\',\''+c.answer+'\',this)">'+o+'</button>';}).join('')+'</div><div id="vq-feedback"></div>';
+}
+function checkVerbalQuiz(chosen,correct,btn){
+  vqTotal++;
+  document.querySelectorAll('#verbal-quiz-area .morfo-quiz-opt').forEach(function(b){b.disabled=true;});
+  var ok=chosen===correct;
+  if(ok)vqCorrect++;
+  btn.classList.add(ok?'correct':'wrong');
+  document.querySelectorAll('#verbal-quiz-area .morfo-quiz-opt').forEach(function(b){if(b.textContent===correct)b.classList.add('correct');});
+  var fb=document.getElementById('vq-feedback');
+  fb.className='morfo-quiz-feedback '+(ok?'ok':'err');
+  fb.textContent=ok?'✓ Correcto':'✗ Era: '+correct;
+  updateVerbalScore();
+  setTimeout(function(){renderVerbalQuiz(vQuizPos+1);},1200);
+}
+
+function initVerbalMatch(){
+  verbalMatchFirst=null;verbalMatchedPairs=0;
+  var pool=buildVerbalCards(verbalFilter,verbalMode).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;}).sort(function(){return Math.random()-.5;}).slice(0,5);
+  var lefts=pool.map(function(c,i){return {id:i,type:'prompt',text:c.prompt,pair:i};});
+  var rights=pool.map(function(c,i){return {id:i+100,type:'answer',text:c.answer,pair:i,greek:true};});
+  var all=[].concat(lefts,rights).sort(function(){return Math.random()-.5;});
+  document.getElementById('verbal-match-grid').innerHTML=all.map(function(item){return '<button class="morfo-match-btn'+(item.greek?' greek':'')+'" data-id="'+item.id+'" data-pair="'+item.pair+'" data-type="'+item.type+'" onclick="selectVerbalMatch(this)">'+item.text+'</button>';}).join('');
+  document.getElementById('verbal-match-status').textContent='0 / '+pool.length+' pares';
+}
+function selectVerbalMatch(btn){
+  if(btn.classList.contains('matched'))return;
+  if(!verbalMatchFirst){verbalMatchFirst=btn;btn.classList.add('selected');return;}
+  if(verbalMatchFirst===btn){verbalMatchFirst.classList.remove('selected');verbalMatchFirst=null;return;}
+  var p1=verbalMatchFirst.dataset.pair,p2=btn.dataset.pair,t1=verbalMatchFirst.dataset.type,t2=btn.dataset.type;
+  if(p1===p2&&t1!==t2){
+    verbalMatchFirst.classList.remove('selected');verbalMatchFirst.classList.add('matched');btn.classList.add('matched');
+    verbalMatchedPairs++;
+    var pool=buildVerbalCards(verbalFilter,verbalMode).filter(function(c,i,a){return a.findIndex(function(x){return x.answer===c.answer;})===i;});
+    document.getElementById('verbal-match-status').textContent=verbalMatchedPairs+' / '+Math.min(5,pool.length)+' pares';
+    verbalMatchFirst=null;
+  } else {
+    verbalMatchFirst.classList.remove('selected');verbalMatchFirst.classList.add('error');btn.classList.add('error');
+    var f=verbalMatchFirst,b=btn;setTimeout(function(){f.classList.remove('error');b.classList.remove('error');},600);verbalMatchFirst=null;
+  }
+}
+
+function renderVerbalQuick(){
+  var area=document.getElementById('verbal-quick-area');
+  var tiempos = TIEMPO_ORDEN.filter(function(f){ return verbalFilter==='all'||verbalFilter===f; });
+  if(!tiempos.length){ area.innerHTML='<div class="empty-state">Sin contenido.</div>'; return; }
+  var voces = ['activa','media','pasiva'];
+  var html = '<div class="morfo-table-wrap"><table class="morfo-table">';
+
+  // Fila de encabezado: columna vacía + un th por tiempo
+  html += '<thead><tr><th></th>';
+  tiempos.forEach(function(fname){
+    var ti = TIEMPO_IDX[fname];
+    var nota = (ti===1||ti===2) ? ' (aum.)' : ti===3 ? ' (redup.)' : '';
+    html += '<th>'+VERBAL.tiempos[ti]+nota+'</th>';
+  });
+  html += '</tr></thead><tbody>';
+
+  // Por cada voz, una fila de encabezado de voz + 6 filas de personas
+  voces.forEach(function(voz){
+    // Fila de etiqueta de voz (celda izquierda con rowspan=6, fondo navy)
+    VERBAL.personas.forEach(function(pers, pi){
+      html += '<tr>';
+      if(pi===0){
+        html += '<td rowspan="6" style="background:var(--navy);color:#fff;font-weight:600;font-size:12px;text-align:center;writing-mode:vertical-rl;transform:rotate(180deg);padding:.4rem .3rem;letter-spacing:.05em">voz '+voz+'</td>';
+      }
+      tiempos.forEach(function(fname){
+        var ti = TIEMPO_IDX[fname];
+        var des = VERBAL[voz][ti][pi];
+        var isGrey = (voz==='pasiva') && (ti!==1 && ti!==4);
+        html += '<td class="greek'+(isGrey?' grey':'')+'" style="text-align:left;padding:.35rem .6rem">';
+        html += '<span style="font-size:10px;color:var(--text-muted);font-family:Inter,sans-serif;margin-right:4px">'+pers+'</span>'+des;
+        html += '</td>';
+      });
+      html += '</tr>';
+    });
+  });
+
+  html += '</tbody></table></div>';
+  html += '<div class="morfo-quick-note">* Las voces media y pasiva tienen la misma conjugación, excepto en el aoristo y en el futuro; nótese las desinencias en gris.<br>* El aumento (ε) indica tiempo pasado (aoristo, imperfecto). La reduplicación indica perfecto.</div>';
+  area.innerHTML = html;
+}
+
+// ── INIT ──
+renderVocabChips();renderTypeChips();initCards();
+
+// ── PWA SERVICE WORKER ──
+if('serviceWorker' in navigator){
+  const swCode = `
+    const CACHE = 'griego-v1';
+    const OFFLINE_URLS = ['/'];
+    self.addEventListener('install', e => {
+      e.waitUntil(caches.open(CACHE).then(c => c.addAll(OFFLINE_URLS)));
+      self.skipWaiting();
+    });
+    self.addEventListener('activate', e => {
+      e.waitUntil(caches.keys().then(keys =>
+        Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
+      ));
+      self.clients.claim();
+    });
+    self.addEventListener('fetch', e => {
+      if(e.request.method !== 'GET') return;
+      e.respondWith(
+        fetch(e.request).catch(() => caches.match(e.request))
+      );
+    });
+  `;
+  const blob = new Blob([swCode], {type:'application/javascript'});
+  const swUrl = URL.createObjectURL(blob);
+  navigator.serviceWorker.register(swUrl).catch(()=>{});
+}
+
+// ── PWA INSTALL PROMPT ──
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  document.getElementById('install-btn').style.display = 'block';
+});
+function installApp(){
+  if(!deferredInstallPrompt) return;
+  deferredInstallPrompt.prompt();
+  deferredInstallPrompt.userChoice.then(()=>{
+    deferredInstallPrompt = null;
+    document.getElementById('install-btn').style.display = 'none';
+  });
+}
+window.addEventListener('appinstalled', ()=>{
+  document.getElementById('install-btn').style.display = 'none';
+});
+
+</script>
+</body>
+</html>
+
+
 
 // ── INIT ──
 renderVocabChips();renderTypeChips();initCards();
