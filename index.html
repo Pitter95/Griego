@@ -2121,7 +2121,7 @@ async function loadProgress(){
     });
   }
 
-  applyMorfoDecay();
+  if(typeof applyMorfoDecay === 'function') applyMorfoDecay();
   setSyncStatus('online','Conectado · progreso cargado');
   document.getElementById('progress-panel').style.display='';
   renderProgressPanel();
