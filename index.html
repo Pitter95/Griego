@@ -191,7 +191,6 @@ body.phonetics-off .phon-hideable{display:none !important}
 .section-btn:hover:not(.active){background:var(--cream-dark)}
 
 /* MORPHOLOGY SECTION */
-#section-morfo{}
 .morfo-status-bar{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:.8rem;flex-wrap:wrap}
 .morfo-mode-toggle{font-size:12px;color:var(--text-muted);display:flex;align-items:center;gap:6px}
 .morfo-mode-toggle button{padding:.3rem .7rem;border:1px solid var(--cream-border);border-radius:6px;background:#fff;font-size:12px;cursor:pointer;color:var(--text-muted);transition:all .15s}
@@ -244,7 +243,6 @@ table.morfo-table tr:last-child td{border-bottom:none}
 table.morfo-table tr:hover td{background:var(--cream-bg)}
 
 /* MORPHOLOGY QUIZ */
-.morfo-quiz-area{}
 .morfo-quiz-score{display:flex;gap:12px;margin-bottom:.8rem;flex-wrap:wrap}
 .morfo-quiz-q{background:#fff;border:1.5px solid var(--cream-border);border-radius:12px;padding:1.2rem;margin-bottom:.8rem;text-align:center}
 .morfo-quiz-q-label{font-size:12px;color:var(--text-muted);margin-bottom:.4rem}
@@ -342,7 +340,11 @@ table.morfo-table tr:hover td{background:var(--cream-bg)}
 .write-feedback-box .wf-answer{font-weight:600}
 .write-next{display:block;margin:1rem auto 0;padding:8px 28px;border-radius:8px;border:0.5px solid var(--navy);background:var(--navy);color:var(--cream);font-size:13px;cursor:pointer}
 .write-next:hover{background:var(--navy-mid)}
-.write-next:disabled{opacity:.25;cursor:default}
+.write-table{display:flex;flex-direction:column;gap:8px}
+.write-row{display:grid;grid-template-columns:minmax(130px,38%) 1fr;gap:12px;align-items:start;background:#fff;border:0.5px solid var(--cream-border);border-radius:10px;padding:10px 12px}
+.write-row-greek{font-family:'SBLGreek',serif;font-size:20px;color:var(--navy);line-height:1.2}
+.write-row-ph{font-size:11px;color:var(--text-hint);font-style:italic}
+.write-row-feedback{font-size:12px;margin-top:5px;line-height:1.5}
 
 .pp-tabs{display:flex;gap:5px;margin:.8rem 0 .7rem;border-bottom:0.5px solid var(--cream-border);padding-bottom:.6rem}
 .pp-tab{padding:4px 12px;border-radius:6px;border:0.5px solid var(--cream-border);font-size:12px;cursor:pointer;background:#fff;color:var(--text-muted)}
@@ -441,8 +443,8 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Λεξικόν">
-<link rel="manifest" href="data:application/manifest+json,{%20%20%22name%22:%20%22Griego%20I%20—%20Vocabularios%22,%20%20%22short_name%22:%20%22Griego%20I%22,%20%20%22description%22:%20%22Vocabularios%20de%20Griego%20del%20Nuevo%20Testamento%22,%20%20%22start_url%22:%20%22/%22,%20%20%22display%22:%20%22standalone%22,%20%20%22background_color%22:%20%22%23F7F4EF%22,%20%20%22theme_color%22:%20%22%231a2e4a%22,%20%20%22orientation%22:%20%22portrait%22,%20%20%22icons%22:%20[%20%20%20%20{%20%20%20%20%20%20%22src%22:%20%22data:image/svg+xml,<svg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20192%20192%27><rect%20width=%27192%27%20height=%27192%27%20rx=%2724%27%20fill=%27%231a2e4a%27/><text%20x=%2750%%27%20y=%2758%%27%20font-size=%27110%27%20text-anchor=%27middle%27%20dominant-baseline=%27middle%27%20fill=%27%23F0EAD6%27%20font-family=%27serif%27>α</text></svg>%22,%20%20%20%20%20%20%22sizes%22:%20%22192x192%22,%20%20%20%20%20%20%22type%22:%20%22image/svg+xml%22,%20%20%20%20%20%20%22purpose%22:%20%22any%20maskable%22%20%20%20%20}%20%20]}">
-<!-- Google Identity Services -->
+<link rel="manifest" href="data:application/manifest+json,{%20%20%22name%22:%20%22%CE%9B%CE%B5%CE%BE%CE%B9%CE%BA%CF%8C%CE%BD%20—%20Vocabularios%20de%20Griego%22,%20%20%22short_name%22:%20%22%CE%9B%CE%B5%CE%BE%CE%B9%CE%BA%CF%8C%CE%BD%22,%20%20%22description%22:%20%22Vocabularios%20de%20Griego%20del%20Nuevo%20Testamento%22,%20%20%22start_url%22:%20%22/%22,%20%20%22display%22:%20%22standalone%22,%20%20%22background_color%22:%20%22%23F7F4EF%22,%20%20%22theme_color%22:%20%22%232A3B4C%22,%20%20%22orientation%22:%20%22portrait%22,%20%20%22icons%22:%20[%20%20%20%20{%20%20%20%20%20%20%22src%22:%20%22data:image/svg+xml,<svg%20xmlns=%27http://www.w3.org/2000/svg%27%20viewBox=%270%200%20192%20192%27><rect%20width=%27192%27%20height=%27192%27%20rx=%2724%27%20fill=%27%231a2e4a%27/><text%20x=%2750%%27%20y=%2758%%27%20font-size=%27110%27%20text-anchor=%27middle%27%20dominant-baseline=%27middle%27%20fill=%27%23F0EAD6%27%20font-family=%27serif%27>α</text></svg>%22,%20%20%20%20%20%20%22sizes%22:%20%22192x192%22,%20%20%20%20%20%20%22type%22:%20%22image/svg+xml%22,%20%20%20%20%20%20%22purpose%22:%20%22any%20maskable%22%20%20%20%20}%20%20]}">
+<!-- Supabase JS -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -579,7 +581,9 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
 </div>
 
 
-<div id="tab-cards">
+<div id="tab-none" class="empty-state">Seleccioná un vocabulario en los filtros para comenzar. Al elegirlo se abre la Lista.</div>
+
+<div id="tab-cards" style="display:none">
   <div class="mode-row">
     <button class="mode-btn active" id="btn-gr-es" onclick="setCardMode('gr-es')">Griego → Español</button>
     <button class="mode-btn" id="btn-es-gr" onclick="setCardMode('es-gr')">Español → Griego</button>
@@ -667,7 +671,7 @@ button:focus-visible,.chip:focus-visible,.tab:focus-visible,input:focus-visible,
     <div class="score-item"><div class="score-num" id="w-pct">—</div><div class="score-label">precisión</div></div>
     <div class="score-item"><div class="score-num" id="w-remain">—</div><div class="score-label">restantes</div></div>
   </div>
-  <p class="write-hint">Escribí todos los significados separados por coma. No hace falta usar comillas. Las aclaraciones entre paréntesis también cuentan.</p>
+  <p class="write-hint">Simulacro de examen: completá el significado de todas las palabras y tocá <strong>Verificar</strong> al final. Escribí todos los significados separados por coma; las aclaraciones entre paréntesis también cuentan.</p>
   <div class="prog-bar prog-green"><div class="prog-fill" id="write-prog" style="width:0%"></div></div>
   <div id="write-area"></div>
 </div>
@@ -852,8 +856,8 @@ const VOCABS={
   V("θάνατος, ὁ","THÁ-na-tos",'"muerte"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("ψυχή, ἡ","psi-JÉ",'"vida", "ser viviente", "alma"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("ὥρα, ἡ","JÓ-ra",'"momento", "ocasión", "hora"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("εἰ","EI",'"si" (condicional)',"partícula","invariable · condicional"),
-  V("εἴτε","EÍ-te",'"si" (condicional)',"partícula","invariable · condicional"),
+  V("εἰ","EI",'"si" (condicional)',"partícula","invariable · conjunción"),
+  V("εἴτε","EÍ-te",'"si" (condicional)',"partícula","invariable · conjunción"),
   V("καθώς","ka-THÓS",'"como", "tal como"',"adverbio","invariable · adverbio"),
   V("ὡς","JOS",'"así", "de este modo"',"adverbio","invariable · adverbio"),
   V("βαπτίζω","vap-TÍ-zo",'"bautizar"',"verbo","variable · verbo"),
@@ -865,7 +869,7 @@ const VOCABS={
   V("προφήτης, ὁ","pro-FÉ-tes",'"profeta"',"sust. 1ª decl.","masc. · 1ª decl."),
   V("γάρ","GAR",'"pues", "porque"',"partícula","invariable · partícula postpositiva"),
   V("ἐκεῖ","e-KÉI",'"allí / allá", "en aquel lugar"',"adverbio","invariable · adverbio"),
-  V("κἀγώ","ka-GÓ",'"y yo", "pero yo"',"partícula","invariable · conjunción"),
+  V("κἀγώ","ka-GÓ",'"y yo", "pero yo"',"partícula","invariable · partícula postpositiva"),
   V("οὖν","UN",'"así pues", "por consiguiente", "por tanto"',"partícula","invariable · partícula postpositiva"),
   V("οὕτως","ÚT-os",'"así", "tal", "de manera"',"adverbio","invariable · adverbio"),
   V("τέ","TE",'"y"',"partícula","invariable · conjunción"),
@@ -962,14 +966,14 @@ const VOCABS={
   V("ἐκβάλλω","ek-VÁL-lo",'"expulsar", "echar fuera", "arrojar"',"verbo","variable · verbo"),
   V("ἐσθίω","es-THÍ-o",'"comer", "alimentarse"',"verbo","variable · verbo"),
   V("ἐξέρχομαι","ek-SÉR-jo-mai",'"salir", "irse", "alejarse"',"verbo","variable · verbo"),
-  V("εὑρίσκω","ef-RÍS-ko",'"hallar", "encontrar", "descubrir"',"verbo","variable · verbo"),
-  V("καταβαίνω","ka-ta-VÉI-no",'"bajar", "descender"',"verbo","variable · verbo"),
+  V("εὑρίσκω","jef-RÍS-ko",'"hallar", "encontrar", "descubrir"',"verbo","variable · verbo"),
+  V("καταβαίνω","ka-ta-VÁI-no",'"bajar", "descender"',"verbo","variable · verbo"),
   V("πίνω","PÍ-no",'"beber"',"verbo","variable · verbo"),
   V("πίπτω","PÍP-to",'"caer"',"verbo","variable · verbo"),
   V("προσέρχομαι","pro-SÉR-jo-mai",'"acercarse a", "ir hacia"',"verbo","variable · verbo"),
   V("φέρω","FÉ-ro",'"llevar", "llevar consigo", "traer"',"verbo","variable · verbo"),
   V("ἐπαγγελία, ἡ","e-pan-ge-LÍ-a",'"promesa"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("αἴρω","ÉI-ro",'"levantar", "quitar"',"verbo","variable · verbo"),
+  V("αἴρω","ÁI-ro",'"levantar", "quitar"',"verbo","variable · verbo"),
   V("ἀπαγγέλλω","a-pan-GÉL-lo",'"comunicar", "informar"',"verbo","variable · verbo"),
   V("ἀποκτείνω","a-pok-TÉI-no",'"matar", "hacer matar"',"verbo","variable · verbo"),
   V("ἀποστέλλω","a-pos-TÉL-lo",'"enviar", "comisionar"',"verbo","variable · verbo"),
@@ -985,7 +989,7 @@ const VOCABS={
   V("σωτηρία, ἡ","so-te-RÍ-a",'"salvación", "liberación"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("χρόνος, ὁ","JRÓ-nos",'"tiempo", "período de tiempo"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("διό","di-Ó",'"por eso", "por lo tanto"',"adverbio","invariable · conjunción"),
-  V("εὐθύς","ef-THÝs",'"en seguida", "inmediatamente"',"adverbio","invariable · adverbio"),
+  V("εὐθύς","ef-THÝS",'"en seguida", "inmediatamente"',"adverbio","invariable · adverbio"),
   V("αἰών, -ῶνος, ὁ","ai-ÓN",'"eternidad", "siglo", "mundo"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("ἀνήρ, ἀνδρός, ὁ","a-NÉR / an-DRÓS",'"hombre", "esposo"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("ἀρχιερεύς, -έως, ὁ","ar-ji-e-RÉFS",'"sumo sacerdote"',"sust. 3ª decl.","masc. · 3ª decl."),
@@ -1062,27 +1066,27 @@ const VOCABS={
   V("ἄρα","Á-ra",'"por consiguiente", "por lo tanto"',"partícula","invariable · partícula postpositiva"),
 ]},
 11:{label:"Vocab. 11",words:[
-  V("ἀναβαίνω","a-na-BAÍ-no",'"subir", "ascender"',"verbo","variable · verbo"),
-  V("ἀπέρχομαι","a-PÉR-jo-me",'"irse", "partir", "alejarse"',"verbo","variable · verbo"),
-  V("ἀποθνῄσκω","a-po-thNÉS-ko",'"morir"',"verbo","variable · verbo"),
-  V("βάλλω","BÁ-lo",'"echar", "arrojar", "expulsar"',"verbo","variable · verbo"),
-  V("εἰσέρχομαι","eis-ÉR-jo-me",'"ir a", "entrar"',"verbo","variable · verbo"),
-  V("ἐκβάλλω","ek-BÁ-lo",'"expulsar", "echar fuera"',"verbo","variable · verbo"),
+  V("ἀναβαίνω","a-na-VÁI-no",'"subir", "ascender"',"verbo","variable · verbo"),
+  V("ἀπέρχομαι","a-PÉR-jo-mai",'"irse", "partir", "alejarse"',"verbo","variable · verbo"),
+  V("ἀποθνῄσκω","a-po-THNÉIS-ko",'"morir"',"verbo","variable · verbo"),
+  V("βάλλω","VÁL-lo",'"echar", "arrojar", "expulsar"',"verbo","variable · verbo"),
+  V("εἰσέρχομαι","eis-ÉR-jo-mai",'"ir a", "entrar"',"verbo","variable · verbo"),
+  V("ἐκβάλλω","ek-VÁL-lo",'"expulsar", "echar fuera"',"verbo","variable · verbo"),
   V("ἐσθίω","es-THÍ-o",'"comer", "alimentarse"',"verbo","variable · verbo"),
-  V("ἐξέρχομαι","ex-ÉR-jo-me",'"salir", "irse", "alejarse"',"verbo","variable · verbo"),
+  V("ἐξέρχομαι","ek-SÉR-jo-mai",'"salir", "irse", "alejarse"',"verbo","variable · verbo"),
   V("εὑρίσκω","jef-RÍS-ko",'"hallar", "encontrar"',"verbo","variable · verbo"),
-  V("καταβαίνω","ka-ta-BAÍ-no",'"bajar", "descender"',"verbo","variable · verbo"),
+  V("καταβαίνω","ka-ta-VÁI-no",'"bajar", "descender"',"verbo","variable · verbo"),
   V("πίνω","PÍ-no",'"beber"',"verbo","variable · verbo"),
   V("πίπτω","PÍP-to",'"caer", "derrumbarse"',"verbo","variable · verbo"),
-  V("προσέρχομαι","pro-sÉR-jo-me",'"acercarse a", "ir hacia", "aproximarse"',"verbo","variable · verbo"),
+  V("προσέρχομαι","pro-SÉR-jo-mai",'"acercarse a", "ir hacia", "aproximarse"',"verbo","variable · verbo"),
   V("φέρω","FÉ-ro",'"llevar", "llevar consigo"',"verbo","variable · verbo"),
   V("ἐπαγγελία","e-pan-ge-LÍ-a",'"promesa"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("αἴρω","AÍ-ro",'"levantar", "alzar"',"verbo","variable · verbo"),
-  V("ἀπαγγέλλω","a-pan-GÉ-lo",'"traer noticias", "comunicar", "informar"',"verbo","variable · verbo"),
-  V("ἀποκτείνω","a-pok-TEÍ-no",'"matar", "hacer matar"',"verbo","variable · verbo"),
-  V("ἀποστέλλω","a-pos-TÉ-lo",'"enviar", "comisionar"',"verbo","variable · verbo"),
-  V("σπείρω","SPEÍ-ro",'"sembrar"',"verbo","variable · verbo"),
-  V("γλῶσσα, ἡ","GLOS-sa",'"habla", "lengua", "idioma"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("αἴρω","ÁI-ro",'"levantar", "alzar"',"verbo","variable · verbo"),
+  V("ἀπαγγέλλω","a-pan-GÉL-lo",'"traer noticias", "comunicar", "informar"',"verbo","variable · verbo"),
+  V("ἀποκτείνω","a-pok-TÉI-no",'"matar", "hacer matar"',"verbo","variable · verbo"),
+  V("ἀποστέλλω","a-pos-TÉL-lo",'"enviar", "comisionar"',"verbo","variable · verbo"),
+  V("σπείρω","SPÉI-ro",'"sembrar"',"verbo","variable · verbo"),
+  V("γλῶσσα, ἡ","GLÓS-sa",'"habla", "lengua", "idioma"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("γραφή, ἡ","gra-FÉ",'"Escritura", "escrito sagrado"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("λίθος, ὁ","LÍ-thos",'"piedra", "piedra preciosa"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("ναός, ὁ","na-ÓS",'"templo", "santuario"',"sust. 2ª decl.","masc. · 2ª decl."),
@@ -1091,164 +1095,164 @@ const VOCABS={
 12:{label:"Vocab. 12",words:[
   V("σοφία, ἡ","so-FÍ-a",'"sabiduría"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("σωτηρία, ἡ","so-te-RÍ-a",'"salvación", "liberación"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("χρόνος, ὁ","KRÓ-nos",'"tiempo", "período de tiempo"',"sust. 2ª decl.","masc. · 2ª decl."),
+  V("χρόνος, ὁ","JRÓ-nos",'"tiempo", "período de tiempo"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("διό","di-Ó",'"por eso", "por esa razón"',"partícula","invariable · conjunción"),
-  V("εὐθύς","ef-THÍS",'"en seguida", "al instante"',"adv.","invariable · adverbio"),
-  V("αἰών, -ῶνος, ὁ","a-IÓN",'"tiempo", "eternidad", "mundo"',"sust. 3ª decl.","masc. · 3ª decl."),
+  V("εὐθύς","ef-THÝS",'"en seguida", "al instante"',"adverbio","invariable · adverbio"),
+  V("αἰών, -ῶνος, ὁ","ai-ÓN",'"tiempo", "eternidad", "mundo"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("ἀνήρ, ἀνδρός, ὁ","a-NÉR",'"varón", "marido"',"sust. 3ª decl.","masc. · 3ª decl."),
-  V("ἀρχιερεύς, ὁ","ar-ji-e-REFS",'"sumo sacerdote"',"sust. 3ª decl.","masc. · 3ª decl."),
+  V("ἀρχιερεύς, ὁ","ar-ji-e-RÉFS",'"sumo sacerdote"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("βασιλεύς, ὁ","va-si-LÉFS",'"rey", "soberano"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("πατήρ, πατρός, ὁ","pa-TÉR",'"padre", "antepasado"',"sust. 3ª decl.","masc. · 3ª decl."),
-  V("γυνή, γυναικός, ἡ","gi-NÉ",'"mujer", "esposa"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("γυνή, γυναικός, ἡ","yi-NÉ",'"mujer", "esposa"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("μήτηρ, μητρός, ἡ","MÉ-ter",'"madre"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("πίστις, ἡ","PÍS-tis",'"fe", "fidelidad"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("πόλις, ἡ","PÓ-lis",'"ciudad"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("σάρξ, σαρκός, ἡ","SARX",'"carne", "cuerpo"',"sust. 3ª decl.","fem. · 3ª decl."),
-  V("χάρις, ἡ","KÁ-ris",'"gracia"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("χάρις, ἡ","JÁ-ris",'"gracia"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("ἔθνος, τό","ÉTH-nos",'"pueblo", "nación"',"sust. 3ª decl.","neutro · 3ª decl."),
   V("ὄνομα, τό","Ó-no-ma",'"nombre"',"sust. 3ª decl.","neutro · 3ª decl."),
-  V("πνεῦμα, τό","PNÉF-ma",'"viento", "aliento vital", "espíritu", "Espíritu"',"sust. 3ª decl.","neutro · 3ª decl."),
+  V("πνεῦμα, τό","PNÉV-ma",'"viento", "aliento vital", "espíritu", "Espíritu"',"sust. 3ª decl.","neutro · 3ª decl."),
   V("σῶμα, τό","SÓ-ma",'"cuerpo"',"sust. 3ª decl.","neutro · 3ª decl."),
   V("ἐγγίζω","en-GÍ-zo",'"acercarse", "aproximarse"',"verbo","variable · verbo"),
   V("ζάω","ZÁ-o",'"vivir", "estar vivo"',"verbo","variable · verbo"),
   V("οἶδα","OÍ-da",'"saber", "conocer", "entender"',"verbo","variable · verbo"),
   V("ὁράω","jo-RÁ-o",'"ver", "mirar", "contemplar"',"verbo","variable · verbo"),
-  V("πείθω","PEÍ-tho",'"convencer", "persuadir"',"verbo","variable · verbo"),
+  V("πείθω","PÉI-tho",'"convencer", "persuadir"',"verbo","variable · verbo"),
 ]},
 13:{label:"Vocab. 13",words:[
   V("μένω","MÉ-no",'"permanecer", "quedarse"',"verbo","variable · verbo"),
-  V("ὑπάγω","i-PÁ-go",'"irse", "apartarse"',"verbo","variable · verbo"),
+  V("ὑπάγω","ji-PÁ-go",'"irse", "apartarse"',"verbo","variable · verbo"),
   V("δοῦλος, ὁ","DÚ-los",'"esclavo", "criado", "siervo"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("θάνατος, ὁ","THÁ-na-tos",'"muerte"',"sust. 2ª decl.","masc. · 2ª decl."),
-  V("ψυχή, ἡ","psi-KÉ",'"vida", "ser viviente", "alma"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("ὥρα, ἡ","Ó-ra",'"momento", "ocasión", "hora"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("εἰ","i",'"si" (condicional)',"partícula","invariable · conjunción"),
+  V("ψυχή, ἡ","psi-JÉ",'"vida", "ser viviente", "alma"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("ὥρα, ἡ","JÓ-ra",'"momento", "ocasión", "hora"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("εἰ","EI",'"si" (condicional)',"partícula","invariable · conjunción"),
   V("εἴτε","EÍ-te",'"si" (condicional)',"partícula","invariable · conjunción"),
-  V("καθώς","ka-THÓS",'"como", "tal como"',"adv.","invariable · adverbio"),
-  V("ὡς","OS",'"así", "de este modo"',"adv.","invariable · adverbio"),
+  V("καθώς","ka-THÓS",'"como", "tal como"',"adverbio","invariable · adverbio"),
+  V("ὡς","JOS",'"así", "de este modo"',"adverbio","invariable · adverbio"),
   V("βαπτίζω","vap-TÍ-zo",'"bautizar"',"verbo","variable · verbo"),
-  V("θεραπεύω","the-ra-PÉF-o",'"curar", "sanar"',"verbo","variable · verbo"),
+  V("θεραπεύω","the-ra-PÉ-vo",'"curar", "sanar"',"verbo","variable · verbo"),
   V("κράζω","KRÁ-zo",'"gritar", "hablar a gritos", "clamar"',"verbo","variable · verbo"),
   V("ἄγγελος, ὁ","ÁN-ge-los",'"mensajero", "ángel"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("μαθητής, ὁ","ma-the-TÉS",'"alumno", "discípulo", "seguidor"',"sust. 1ª decl.","masc. · 1ª decl."),
   V("ὄχλος, ὁ","ÓJ-los",'"multitud", "gentío", "turba"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("προφήτης, ὁ","pro-FÉ-tes",'"profeta"',"sust. 1ª decl.","masc. · 1ª decl."),
   V("γάρ","GAR",'"pues", "porque"',"partícula","invariable · partícula postpositiva"),
-  V("ἐκεῖ","e-KÍ",'"allí", "allá", "en aquel lugar"',"adv.","invariable · adverbio"),
+  V("ἐκεῖ","e-KÉI",'"allí / allá", "en aquel lugar"',"adverbio","invariable · adverbio"),
   V("κἀγώ","ka-GÓ",'"y yo", "pero yo"',"partícula","invariable · partícula postpositiva"),
   V("οὖν","UN",'"así pues", "por consiguiente", "por tanto"',"partícula","invariable · partícula postpositiva"),
-  V("οὕτως","ÚT-os",'"así", "tal", "de manera"',"adv.","invariable · adverbio"),
+  V("οὕτως","ÚT-os",'"así", "tal", "de manera"',"adverbio","invariable · adverbio"),
   V("τέ","TE",'"y"',"partícula","invariable · conjunción"),
   V("οὐ, οὐκ, οὐχ","U / UK / UJ",'"no"',"partícula","invariable · negación"),
-  V("οὐχί","u-JÍ",'"no" (forma enfática), "de ninguna manera"',"partícula","invariable · negación"),
+  V("οὐχί","u-JÍ",'"no" (forma enfática de οὐ), "de ninguna manera"',"partícula","invariable · negación"),
 ]},
 14:{label:"Vocab. 14",words:[
-  V("ἀπό","a-PÓ",'"desde", "por"',"prep.","invariable · preposición · + gen."),
-  V("διά","di-Á",'"a través de", "a causa de"',"prep.","invariable · preposición · + gen./ac."),
-  V("εἰς","IS",'"hacia", "para"',"prep.","invariable · preposición · + ac."),
-  V("ἐκ","EK",'"desde", "de (el interior de)"',"prep.","invariable · preposición · + gen."),
-  V("ἐν","EN",'"en"',"prep.","invariable · preposición · + dat."),
-  V("ἐπί","e-PÍ",'"sobre"',"prep.","invariable · preposición · + gen./dat./ac."),
-  V("κατά","ka-TÁ",'"según", "conforme a"',"prep.","invariable · preposición · + gen./ac."),
-  V("μετά","me-TÁ",'"con"',"prep.","invariable · preposición · + gen./ac."),
-  V("παρά","pa-RÁ",'"de", "del lado de"',"prep.","invariable · preposición · + gen./dat./ac."),
-  V("περί","pe-RÍ",'"acerca de", "en relación con"',"prep.","invariable · preposición · + gen./ac."),
-  V("πρός","PROS",'"a", "hacia"',"prep.","invariable · preposición · + ac."),
-  V("σύν","SIN",'"con", "en compañía de"',"prep.","invariable · preposición · + dat."),
-  V("ὑπέρ","i-PÉR",'"a favor de", "en lugar de", "más allá de"',"prep.","invariable · preposición · + gen./ac."),
-  V("ὑπό","i-PÓ",'"por", "por causa de"',"prep.","invariable · preposición · + gen./ac."),
-  V("αὐτός, -ή, -ό","af-TÓS",'"él", "ella", "ello", "él mismo"',"pron.","variable · pronombre"),
-  V("ἐγώ, ἡμεῖς","e-GÓ / e-MÉIS",'"yo", "nosotros"',"pron.","variable · pronombre"),
-  V("ὅς, ἥ, ὅ","OS / É / O",'"que", "quien", "el que", "el cual"',"pron.","variable · pronombre"),
-  V("σύ, ὑμεῖς","SI / i-MÉIS",'"tú", "ustedes"',"pron.","variable · pronombre"),
+  V("ἀπό","a-PÓ",'"desde", "por"',"preposición","invariable · preposición · + gen."),
+  V("διά","di-Á",'"a través de", "a causa de"',"preposición","invariable · preposición · + gen./ac."),
+  V("εἰς","EIS",'"hacia", "para"',"preposición","invariable · preposición · + ac."),
+  V("ἐκ","EK",'"desde", "de (el interior de)"',"preposición","invariable · preposición · + gen."),
+  V("ἐν","EN",'"en"',"preposición","invariable · preposición · + dat."),
+  V("ἐπί","e-PÍ",'"sobre"',"preposición","invariable · preposición · + gen./dat./ac."),
+  V("κατά","ka-TÁ",'"según", "conforme a"',"preposición","invariable · preposición · + gen./ac."),
+  V("μετά","me-TÁ",'"con"',"preposición","invariable · preposición · + gen./ac."),
+  V("παρά","pa-RÁ",'"de", "del lado de"',"preposición","invariable · preposición · + gen./dat./ac."),
+  V("περί","pe-RÍ",'"acerca de", "en relación con"',"preposición","invariable · preposición · + gen./ac."),
+  V("πρός","PROS",'"a", "hacia"',"preposición","invariable · preposición · + ac."),
+  V("σύν","SIN",'"con", "en compañía de"',"preposición","invariable · preposición · + dat."),
+  V("ὑπέρ","ji-PÉR",'"a favor de", "en lugar de", "más allá de"',"preposición","invariable · preposición · + gen./ac."),
+  V("ὑπό","ji-PÓ",'"por", "por causa de"',"preposición","invariable · preposición · + gen./ac."),
+  V("αὐτός, -ή, -ό","af-TÓS",'"él", "ella", "ello", "él mismo"',"pronombre","variable · pronombre"),
+  V("ἐγώ, ἡμεῖς","e-GÓ / e-MÉIS",'"yo", "nosotros"',"pronombre","variable · pronombre"),
+  V("ὅς, ἥ, ὅ","JOS / E / JO",'"que", "quien", "el que", "el cual"',"pronombre","variable · pronombre"),
+  V("σύ, ὑμεῖς","SI / i-MÉIS",'"tú", "ustedes"',"pronombre","variable · pronombre"),
   V("ἤ","É",'"o", "o también"',"partícula","invariable · conjunción"),
-  V("πᾶς, πᾶσα, πᾶν","PAS / PÁ-sa / PAN",'"todo", "completo" / "cada uno", "todo aquel"',"adjetivo","variable · adjetivo"),
-  V("νῦν","NIN",'"ahora", "en este mismo momento"',"adv.","invariable · adverbio"),
-  V("πάλιν","PÁ-lin",'"de nuevo", "otra vez"',"adv.","invariable · adverbio"),
-  V("ἕως","É-os",'"hasta que", "mientras que"',"partícula","invariable · conjunción"),
+  V("πᾶς, πᾶσα, πᾶν","PAS / PÁ-sa / PAN",'(artroso) "todo", "completo" / (anartroso) "cada uno", "todo aquel"',"adjetivo","variable · adjetivo"),
+  V("νῦν","NÝN",'"ahora", "en este mismo momento"',"adverbio","invariable · adverbio"),
+  V("πάλιν","PÁ-lin",'"de nuevo", "otra vez"',"adverbio","invariable · adverbio"),
+  V("ἕως","JÉ-os",'"hasta que", "mientras que"',"partícula","invariable · conjunción"),
   V("οὐδέ","u-DÉ",'"y no", "ni", "tampoco", "ni siquiera"',"partícula","invariable · conjunción"),
   V("οὔτε","ÚT-e",'"y no", "ni"',"partícula","invariable · conjunción"),
 ]},
 15:{label:"Vocab. 15",words:[
-  V("ἁμαρτάνω","a-mar-TÁ-no",'"errar", "obrar mal", "pecar"',"verbo","variable · verbo"),
-  V("πταίω","PTAÍ-o",'"caer", "errar", "pecar"',"verbo","variable · verbo"),
-  V("ἁμαρτία","a-mar-TÍ-a",'"pecado", "culpa", "falta"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("ἁμαρτάνω","ja-mar-TÁ-no",'"errar", "obrar mal", "pecar"',"verbo","variable · verbo"),
+  V("πταίω","PTÁI-o",'"caer", "errar", "pecar"',"verbo","variable · verbo"),
+  V("ἁμαρτία","ja-mar-TÍ-a",'"pecado", "culpa", "falta"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("παράπτωμα","pa-RÁP-to-ma",'"pecado", "transgresión", "caída"',"sust. 3ª decl.","neutro · 3ª decl."),
-  V("ἁμαρτωλός","a-mar-to-LÓS",'"pecaminoso", "pecador"',"adjetivo","variable · adjetivo"),
+  V("ἁμαρτωλός","ja-mar-to-LÓS",'"pecaminoso", "pecador"',"adjetivo","variable · adjetivo"),
   V("ἀδικία","a-di-KÍ-a",'"injusticia", "iniquidad"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("ἀγνόημα","ag-NÓ-e-ma",'"transgresión", "delito (por ignorancia)"',"sust. 3ª decl.","neutro · 3ª decl."),
   V("ἀκούω","a-KÚ-o",'"oír", "escuchar", "obedecer"',"verbo","variable · verbo"),
-  V("ὑπακούω","i-pa-KÚ-o",'"obedecer"',"verbo","variable · verbo"),
-  V("ἀπειθέω","a-pei-THÉE-o",'"desobedecer", "ser incrédulo"',"verbo","variable · verbo"),
+  V("ὑπακούω","ji-pa-KÚ-o",'"obedecer"',"verbo","variable · verbo"),
+  V("ἀπειθέω","a-pei-THÉ-o",'"desobedecer", "ser incrédulo"',"verbo","variable · verbo"),
   V("πειθαρχέω","pei-thar-KÉ-o",'"obedecer"',"verbo","variable · verbo"),
   V("παρακούω","pa-ra-KÚ-o",'"hacer caso omiso", "no prestar atención"',"verbo","variable · verbo"),
   V("παράβασις","pa-RÁ-va-sis",'"transgresión", "violación de la ley"',"sust. 3ª decl.","fem. · 3ª decl."),
-  V("μοιχεύω","moi-KHÉF-o",'"cometer adulterio"',"verbo","variable · verbo"),
-  V("μοιχός","moi-KHÓS",'"adúltero"',"sust. 2ª decl.","masc. · 2ª decl."),
-  V("μοιχαλίς","moi-kha-LÍS",'"adultera"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("μοιχεύω","moi-JÉ-vo",'"cometer adulterio"',"verbo","variable · verbo"),
+  V("μοιχός","moi-JÓS",'"adúltero"',"sust. 2ª decl.","masc. · 2ª decl."),
+  V("μοιχαλίς","moi-ja-LÍS",'"adúltera"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("πόρνος","PÓR-nos",'"disoluto", "libertino", "inmoral"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("πόρνη","PÓR-ne",'"prostituta", "ramera", "idólatra"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("ἀρσενοκοίτης","ar-se-no-KOÍ-tes",'"homosexual" (activo)',"sust. 1ª decl.","masc. · 1ª decl."),
   V("μαλακός","ma-la-KÓS",'"homosexual" (pasivo)',"adjetivo","variable · adjetivo"),
-  V("ἀσέλγεια","a-SÉL-gei-a",'"perversión", "desenfreno (sexual)"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("ἀσέλγεια","a-SÉL-yei-a",'"perversión", "desenfreno (sexual)"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("κοίτη","KOÍ-te",'"cama", "relaciones sexuales"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("παιδεύω","pai-DEF-o",'"educar", "enseñar", "corregir"',"verbo","variable · verbo"),
-  V("παιδεία","pai-DEÍ-a",'"educación", "enseñanza", "corrección"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("παιδεύω","pai-DÉ-vo",'"educar", "enseñar", "corregir"',"verbo","variable · verbo"),
+  V("παιδεία","pai-DÉI-a",'"educación", "enseñanza", "corrección"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("γυμνάζω","gim-NÁ-zo",'"ejercitar", "adiestrar"',"verbo","variable · verbo"),
 ]},
 16:{label:"Vocab. 16",words:[
   V("ἀφίημι","a-FÍ-e-mi",'"perdonar"',"verbo","variable · verbo"),
-  V("ἱλάσκομαι","i-LÁS-ko-me",'"reconciliarse", "expiar"',"verbo","variable · verbo"),
-  V("χαρίζομαι","kha-RÍ-zo-me",'"conceder perdón", "perdonar"',"verbo","variable · verbo"),
+  V("ἱλάσκομαι","ji-LÁS-ko-mai",'"reconciliarse", "expiar"',"verbo","variable · verbo"),
+  V("χαρίζομαι","ja-RÍ-zo-mai",'"conceder perdón", "perdonar"',"verbo","variable · verbo"),
   V("ἐπικαλύπτω","e-pi-ka-LÍP-to",'"cubrir", "ocultar"',"verbo","variable · verbo"),
-  V("ἱλασμός","i-las-MÓS",'"propiciación", "expiación"',"sust. 2ª decl.","masc. · 2ª decl."),
-  V("ἱλαστήριον","i-las-TÉ-ri-on",'"propiciatorio", "lugar de expiación"',"sust. 2ª decl.","neutro · 2ª decl."),
+  V("ἱλασμός","ji-las-MÓS",'"propiciación", "expiación"',"sust. 2ª decl.","masc. · 2ª decl."),
+  V("ἱλαστήριον","ji-las-TÉ-ri-on",'"propiciatorio", "lugar de expiación"',"sust. 2ª decl.","neutro · 2ª decl."),
   V("καταλλάσσω","ka-ta-LÁ-so",'"reconciliar", "reconciliarse"',"verbo","variable · verbo"),
   V("διαλλάσσομαι","di-a-LÁ-so-me",'"reconciliarse", "hacer las paces"',"verbo","variable · verbo"),
-  V("εἰρηνοποιέω","ei-re-no-poi-ÉE-o",'"hacer o establecer la paz", "pacificar"',"verbo","variable · verbo"),
+  V("εἰρηνοποιέω","ei-re-no-poi-É-o",'"hacer o establecer la paz", "pacificar"',"verbo","variable · verbo"),
   V("εἰρηνοποιός","ei-re-no-poi-ÓS",'"pacificador", "intermediario de paz"',"adjetivo","variable · adjetivo"),
   V("μεσίτης","me-SÍ-tes",'"mediador", "intermediario", "garante"',"sust. 1ª decl.","masc. · 1ª decl."),
   V("ἄσπονδος","ÁS-pon-dos",'"implacable", "irreconciliable"',"adjetivo","variable · adjetivo"),
-  V("εὐψυχέω","ef-psi-KHÉ-o",'"tener buen ánimo"',"verbo","variable · verbo"),
+  V("εὐψυχέω","ef-psi-JÉ-o",'"tener buen ánimo"',"verbo","variable · verbo"),
   V("εὔθυμος","ÉF-thi-mos",'"de buen ánimo", "animado"',"adjetivo","variable · adjetivo"),
-  V("ἀνάψυξις","a-NÁP-six-is",'"alivio", "refrigerio", "descanso"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("ἀνάψυξις","a-NÁ-psix-is",'"alivio", "refrigerio", "descanso"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("ἀναψύχω","a-na-PSÍ-jo",'"aliviar", "confortar"',"verbo","variable · verbo"),
   V("παρακαλέω","pa-ra-ka-LÉ-o",'"animar", "consolar", "alentar"',"verbo","variable · verbo"),
-  V("συμπαρακαλέομαι","sim-pa-ra-ka-LÉ-o-me",'"animarse mutuamente"',"verbo","variable · verbo"),
-  V("παραμυθέομαι","pa-ra-mi-THÉE-o-me",'"consolar", "alentar", "confortar"',"verbo","variable · verbo"),
+  V("συμπαρακαλέομαι","sim-pa-ra-ka-LÉ-o-mai",'"animarse mutuamente"',"verbo","variable · verbo"),
+  V("παραμυθέομαι","pa-ra-mi-THÉ-o-mai",'"consolar", "alentar", "confortar"',"verbo","variable · verbo"),
   V("παραμύθιον","pa-ra-MÍ-thi-on",'"palabras de ánimo", "consuelo"',"sust. 2ª decl.","neutro · 2ª decl."),
   V("παρηγορία","pa-re-go-RÍ-a",'"consuelo", "aliento"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("διανοίγω","di-a-NÓI-go",'"explicar", "interpretar"',"verbo","variable · verbo"),
   V("διασαφέω","di-a-sa-FÉ-o",'"mostrar claramente", "describir exactamente"',"verbo","variable · verbo"),
-  V("ἑρμηνεύω","er-me-NÉF-o",'"explicar", "interpretar", "traducir"',"verbo","variable · verbo"),
+  V("ἑρμηνεύω","jer-me-NÉ-vo",'"explicar", "interpretar", "traducir"',"verbo","variable · verbo"),
   V("διερμηνευτής","di-er-me-nef-TÉS",'"intérprete", "traductor"',"sust. 1ª decl.","masc. · 1ª decl."),
 ]},
 17:{label:"Vocab. 17",words:[
-  V("ἑρμηνεία","er-me-NÍ-a",'"interpretación", "traducción"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("ἑρμηνεία","jer-me-NÉI-a",'"interpretación", "traducción"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("δείκνυμι","DEÍK-ni-mi",'"explicar", "exponer", "esclarecer"',"verbo","variable · verbo"),
   V("συγκρίνω","sin-KRÍ-no",'"comparar", "conjeturar", "explicar"',"verbo","variable · verbo"),
   V("στρεβλόω","strev-LÓ-o",'"distorsionar", "malinterpretar"',"verbo","variable · verbo"),
-  V("εἰσέρχομαι","eis-ÉR-jo-me",'"ir a", "entrar"',"verbo","variable · verbo"),
+  V("εἰσέρχομαι","eis-ÉR-jo-mai",'"ir a", "entrar"',"verbo","variable · verbo"),
   V("παραβολή, ἡ","pa-ra-vo-LÉ",'"comparación", "parábola"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("παροιμία","pa-roi-MÍ-a",'"proverbio", "comparación"',"sust. 1ª decl.","fem. · 1ª decl."),
-  V("διήγησις","di-É-ge-sis",'"narración", "exposición (histórica)"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("διήγησις","di-É-ye-sis",'"narración", "exposición (histórica)"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("κεφάλαιον","ke-FÁ-lai-on",'"punto principal", "lo más importante"',"sust. 2ª decl.","neutro · 2ª decl."),
   V("μῦθος","MÍ-thos",'"leyenda", "mito", "fábula", "cuento"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("ἀλληγορέω","a-le-go-RÉ-o",'"hablar figurada o alegóricamente"',"verbo","variable · verbo"),
   V("φωνή","fo-NÉ",'"voz", "sonido", "tono", "palabra"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("διάλεκτος","di-Á-lek-tos",'"idioma", "lengua", "dialecto"',"sust. 2ª decl.","fem. · 2ª decl."),
-  V("ἑτερόγλωσσος","e-te-RÓG-lo-sos",'"que habla otra lengua"',"adjetivo","variable · adjetivo"),
-  V("Ἑλληνιστί","e-le-nis-TÍ",'"en griego", "en lengua griega"',"adv.","invariable · adverbio"),
-  V("Ἑβραϊστί","e-vra-is-TÍ",'"en hebreo", "en lengua hebrea"',"adv.","invariable · adverbio"),
-  V("Ῥωμαϊστί","ro-ma-is-TÍ",'"en latín", "en lengua latina"',"adv.","invariable · adverbio"),
-  V("ῥῆμα","RÉ-ma",'"dicho", "palabra", "asunto"',"sust. 3ª decl.","neutro · 3ª decl."),
-  V("εὔχομαι","ÉF-jo-me",'"orar", "pedir"',"verbo","variable · verbo"),
-  V("προσεύχομαι","pro-SÉF-jo-me",'"orar", "suplicar"',"verbo","variable · verbo"),
-  V("προσευχή","pro-sev-KÉ",'"oración", "plegaria", "intercesión"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("ἑτερόγλωσσος","je-te-RÓ-glo-sos",'"que habla otra lengua"',"adjetivo","variable · adjetivo"),
+  V("Ἑλληνιστί","je-le-nis-TÍ",'"en griego", "en lengua griega"',"adverbio","invariable · adverbio"),
+  V("Ἑβραϊστί","je-vra-is-TÍ",'"en hebreo", "en lengua hebrea"',"adverbio","invariable · adverbio"),
+  V("Ῥωμαϊστί","jro-ma-is-TÍ",'"en latín", "en lengua latina"',"adverbio","invariable · adverbio"),
+  V("ῥῆμα","JRÉ-ma",'"dicho", "palabra", "asunto"',"sust. 3ª decl.","neutro · 3ª decl."),
+  V("εὔχομαι","ÉF-jo-mai",'"orar", "pedir"',"verbo","variable · verbo"),
+  V("προσεύχομαι","pro-SEF-jo-mai",'"orar", "suplicar"',"verbo","variable · verbo"),
+  V("προσευχή","pro-sef-JÉ",'"oración", "plegaria", "intercesión"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("κῆρυξ","KÉ-rix",'"mensajero", "predicador", "apóstol"',"sust. 3ª decl.","masc. · 3ª decl."),
-  V("κηρύσσω","ke-RÍ-so",'"proclamar", "predicar"',"verbo","variable · verbo"),
+  V("κηρύσσω","ke-RÝS-so",'"proclamar", "predicar"',"verbo","variable · verbo"),
   V("κήρυγμα","KÉ-rig-ma",'"proclamación", "predicación"',"sust. 3ª decl.","neutro · 3ª decl."),
-  V("προκηρύσσω","pro-ke-RÍ-so",'"pregonar públicamente"',"verbo","variable · verbo"),
+  V("προκηρύσσω","pro-ke-RÝS-so",'"pregonar públicamente"',"verbo","variable · verbo"),
 ]},
 18:{label:"Vocab. 18",words:[
   V("διδάσκω","di-DÁS-ko",'"enseñar", "instruir"',"verbo","variable · verbo"),
@@ -1262,20 +1266,20 @@ const VOCABS={
   V("καλοδιδάσκαλος","ka-lo-di-DÁS-ka-los",'"que enseña lo que es bueno"',"adjetivo","variable · adjetivo"),
   V("ψευδοδιδάσκαλος","psev-do-di-DÁS-ka-los",'"falso maestro"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("παιδευτής","pai-def-TÉS",'"maestro", "educador"',"sust. 1ª decl.","masc. · 1ª decl."),
-  V("καθηγητής","ka-the-gi-TÉS",'"guía", "maestro"',"sust. 1ª decl.","masc. · 1ª decl."),
-  V("ῥαββί","ra-VÍ",'"maestro", "rabbí" [arameo]',"sust.","invariable · sustantivo"),
-  V("ῥαββουνί","ra-vu-NÍ",'"mi maestro", "mi señor" [arameo]',"sust.","invariable · sustantivo"),
+  V("καθηγητής","ka-the-ye-TÉS",'"guía", "maestro"',"sust. 1ª decl.","masc. · 1ª decl."),
+  V("ῥαββί","jra-VÍ",'"maestro", "rabbí" [arameo]',"sust.","invariable · sustantivo"),
+  V("ῥαββουνί","jra-vu-NÍ",'"mi maestro", "mi señor" [arameo]',"sust.","invariable · sustantivo"),
   V("θεοδίδακτος","the-o-DÍ-dak-tos",'"instruido", "enseñado por Dios"',"adjetivo","variable · adjetivo"),
   V("σωφρονίζω","so-fro-NÍ-zo",'"corregir", "advertir", "aconsejar"',"verbo","variable · verbo"),
   V("νουθετέω","nu-the-TÉ-o",'"instruir", "dar buenos consejos"',"verbo","variable · verbo"),
   V("νουθεσία","nu-the-SÍ-a",'"corrección", "advertencia"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("ὀρθοτομέω","or-tho-to-MÉ-o",'"enseñar bien", "proclamar rectamente"',"verbo","variable · verbo"),
-  V("ἑτεροδιδασκαλέω","e-te-ro-di-das-ka-LÉ-o",'"difundir una doctrina diferente"',"verbo","variable · verbo"),
+  V("ἑτεροδιδασκαλέω","je-te-ro-di-das-ka-LÉ-o",'"difundir una doctrina diferente"',"verbo","variable · verbo"),
   V("παραδίδωμι","pa-ra-DÍ-do-mi",'"entregar", "transmitir"',"verbo","variable · verbo"),
-  V("παραλαμβάνω","pa-ra-lam-BÁ-no",'"recibir", "aceptar"',"verbo","variable · verbo"),
+  V("παραλαμβάνω","pa-ra-lam-VÁ-no",'"recibir", "aceptar"',"verbo","variable · verbo"),
   V("παράδοσις","pa-RÁ-do-sis",'"tradición", "reglamentación"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("πατροπαράδοτος","pa-tro-pa-RÁ-do-tos",'"transmitido de padre a hijo"',"adjetivo","variable · adjetivo"),
-  V("αἵρεσις","JÉ-re-sis",'"secta", "partido", "facción"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("αἵρεσις","JÁI-re-sis",'"secta", "partido", "facción"',"sust. 3ª decl.","fem. · 3ª decl."),
 ]},
 19:{label:"Vocab. 19",words:[
   V("μαρτυρέω","mar-ti-RÉ-o",'"dar testimonio", "testificar"',"verbo","variable · verbo"),
@@ -1290,14 +1294,14 @@ const VOCABS={
   V("ψευδόμαρτυς","psev-DÓ-mar-tis",'"testigo falso"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("ἐρωτάω","e-ro-TÁ-o",'"preguntar"',"verbo","variable · verbo"),
   V("ἐπερωτάω","e-pe-ro-TÁ-o",'"interrogar"',"verbo","variable · verbo"),
-  V("πυνθάνομαι","pin-THÁ-no-me",'"indagar", "averiguar"',"verbo","variable · verbo"),
+  V("πυνθάνομαι","pin-THÁ-no-mai",'"indagar", "averiguar"',"verbo","variable · verbo"),
   V("ἐξετάζω","ex-e-TÁ-zo",'"averiguar", "investigar", "indagar"',"verbo","variable · verbo"),
   V("ἀποστοματίζω","a-pos-to-ma-TÍ-zo",'"interrogar" (connota hostilidad)',"verbo","variable · verbo"),
-  V("ἀποκρίνομαι","a-po-KRÍ-no-me",'"replicar", "responder"',"verbo","variable · verbo"),
+  V("ἀποκρίνομαι","a-po-KRÍ-no-mai",'"replicar", "responder"',"verbo","variable · verbo"),
   V("ἀπόκρισις","a-PÓK-ri-sis",'"respuesta", "contestación"',"sust. 3ª decl.","fem. · 3ª decl."),
   V("νόμος","NÓ-mos",'"ley", "principio", "regla"',"sust. 2ª decl.","masc. · 2ª decl."),
   V("δόγμα","DÓG-ma",'"ley", "regla", "norma", "ordenanza"',"sust. 3ª decl.","neutro · 3ª decl."),
-  V("δικαίωμα","di-KÉ-o-ma",'"exigencia jurídica", "mandamiento"',"sust. 3ª decl.","neutro · 3ª decl."),
+  V("δικαίωμα","di-KÁI-o-ma",'"exigencia jurídica", "mandamiento"',"sust. 3ª decl.","neutro · 3ª decl."),
   V("κανών","ka-NÓN",'"norma", "regla", "principio", "canon"',"sust. 3ª decl.","masc. · 3ª decl."),
   V("ἔννομος","ÉN-no-mos",'"conforme a la ley", "legal"',"adjetivo","variable · adjetivo"),
   V("νομικός","no-mi-KÓS",'"concerniente a la ley", "jurista", "doctor de la ley"',"adjetivo","variable · adjetivo"),
@@ -1305,18 +1309,18 @@ const VOCABS={
   V("ψιθυριστής","psi-thi-ris-TÉS",'"murmurador", "chismoso"',"sust. 1ª decl.","masc. · 1ª decl."),
 ]},
 20:{label:"Vocab. 20",words:[
-  V("καί","KÉ",'"y", "también", "asimismo"',"partícula","invariable · conjunción"),
+  V("καί","KAI",'"y", "también", "asimismo"',"partícula","invariable · conjunción"),
   V("γάρ","GAR",'"pues", "porque", "por tanto"',"partícula","invariable · partícula postpositiva"),
-  V("ἀλλά","a-LÁ",'"pero", "por el contrario"',"partícula","invariable · conjunción"),
-  V("νυνὶ δέ","ni-NÍ DE",'"y así", "en consecuencia"',"adv.","invariable · adverbio"),
+  V("ἀλλά","al-LÁ",'"pero", "por el contrario"',"partícula","invariable · conjunción"),
+  V("νυνὶ δέ","ni-NÍ DE",'"y así", "en consecuencia"',"adverbio","invariable · adverbio"),
   V("ἰδού","i-DÚ",'"mirad", "he aquí"',"partícula","invariable · partícula"),
   V("ὦ","O",'"¡oh!"',"partícula","invariable · interjección"),
   V("καιρός","kai-RÓS",'"momento oportuno", "ocasión"',"sust. 2ª decl.","masc. · 2ª decl."),
-  V("χρόνος","KRÓ-nos",'"tiempo", "período de tiempo"',"sust. 2ª decl.","masc. · 2ª decl."),
-  V("ὥρα","Ó-ra",'"hora", "tiempo"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("χρόνος","JRÓ-nos",'"tiempo", "período de tiempo"',"sust. 2ª decl.","masc. · 2ª decl."),
+  V("ὥρα","JÓ-ra",'"hora", "tiempo"',"sust. 1ª decl.","fem. · 1ª decl."),
   V("πυκνός","pik-NÓS",'"frecuente"',"adjetivo","variable · adjetivo"),
-  V("πυκνά","pik-NÁ",'"a menudo", "con frecuencia"',"adv.","invariable · adverbio"),
-  V("χρονοτριβέω","kro-no-tri-VÉ-o",'"dejar pasar el tiempo"',"verbo","variable · verbo"),
+  V("πυκνά","pik-NÁ",'"a menudo", "con frecuencia"',"adverbio","invariable · adverbio"),
+  V("χρονοτριβέω","jro-no-tri-VÉ-o",'"dejar pasar el tiempo"',"verbo","variable · verbo"),
   V("ἀληθής","a-le-THÉS",'"verdadero", "auténtico", "real", "veraz"',"adjetivo","variable · adjetivo"),
   V("ἀληθινός","a-le-thi-NÓS",'"real", "veraz", "fiable", "sincero"',"adjetivo","variable · adjetivo"),
   V("ἀλήθεια","a-LÉ-thei-a",'"verdad", "veracidad", "rectitud"',"sust. 1ª decl.","fem. · 1ª decl."),
@@ -1324,19 +1328,21 @@ const VOCABS={
   V("δολόω","do-LÓ-o",'"cambiar engañosamente", "falsificar"',"verbo","variable · verbo"),
   V("κενός","ke-NÓS",'"vano", "sin fundamento"',"adjetivo","variable · adjetivo"),
   V("τέλειος","TÉ-lei-os",'"completo", "perfecto", "desarrollado"',"adjetivo","variable · adjetivo"),
-  V("τελειότης","te-lei-ÓT-es",'"realización", "perfección", "madurez"',"sust. 3ª decl.","fem. · 3ª decl."),
-  V("τελειόω","te-lei-ÓO",'"acabar", "completar", "perfeccionar"',"verbo","variable · verbo"),
-  V("ὑποκριτής","i-po-kri-TÉS",'"impostor", "impío", "hipócrita"',"sust. 1ª decl.","masc. · 1ª decl."),
-  V("ὑποκρίνομαι","i-po-KRÍ-no-me",'"fingir", "representar un papel"',"verbo","variable · verbo"),
-  V("ὑπόκρισις","i-PÓK-ri-sis",'"fingimiento", "hipocresía", "simulación"',"sust. 3ª decl.","fem. · 3ª decl."),
-  V("πιθανολογία","pi-tha-no-lo-GÍ-a",'"palabras persuasivas", "sofisma", "falacia"',"sust. 1ª decl.","fem. · 1ª decl."),
+  V("τελειότης","te-lei-Ó-tes",'"realización", "perfección", "madurez"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("τελειόω","te-lei-Ó-o",'"acabar", "completar", "perfeccionar"',"verbo","variable · verbo"),
+  V("ὑποκριτής","ji-po-kri-TÉS",'"impostor", "impío", "hipócrita"',"sust. 1ª decl.","masc. · 1ª decl."),
+  V("ὑποκρίνομαι","ji-po-KRÍ-no-mai",'"fingir", "representar un papel"',"verbo","variable · verbo"),
+  V("ὑπόκρισις","ji-PÓK-ri-sis",'"fingimiento", "hipocresía", "simulación"',"sust. 3ª decl.","fem. · 3ª decl."),
+  V("πιθανολογία","pi-tha-no-lo-YÍ-a",'"palabras persuasivas", "sofisma", "falacia"',"sust. 1ª decl.","fem. · 1ª decl."),
 ]}
 };
+const TOTAL_WORDS=Object.values(VOCABS).reduce((a,v)=>a+v.words.length,0);
 
 // ── STATE ──
 let filterMode='vocab',selectedVocabs=new Set(),selectedTypes=new Set(),stateFilters=new Set();
 let activeWords=[],listSort='vocab',listSRSFilter='all',cardMode='gr-es',quizMode='gr-es',matchSize=5,panelOpen=true;
 let ppTab='vocab';
+let progressPanelOpen=false;
 let cardQueue=[],cardPos=0,cardFlipped=false,currentCardWord=null;
 let quizQueue=[],quizPos=0,quizAnswered=false,qCorrect=0,qTotal=0;
 let matchPairs=[],selGr=null,selEs=null,mMatched=0,mErrors=0,mStart=null;
@@ -1453,9 +1459,16 @@ function selectNoneTypes(){selectedTypes.clear();renderTypeChips();buildActiveWo
 
 // ── TABS ──
 function showTab(t){
+  const hint=document.getElementById('tab-none');
+  if(hint)hint.style.display='none';
   ['cards','list','quiz','match','write'].forEach(x=>document.getElementById('tab-'+x).style.display=x===t?'':'none');
   document.querySelectorAll('.tab').forEach((el,i)=>el.classList.toggle('active',['list','quiz','match','cards','write'][i]===t));
-  if(t==='list')renderList();else if(t==='quiz')initQuiz();else if(t==='match')restartMatch();else if(t==='write')restartWrite();
+  setPhonetics(t==='list');
+  if(t==='list')renderList();
+  else if(t==='cards'){if(!cardQueue.length)initCards();else renderCard();}
+  else if(t==='quiz')initQuiz();
+  else if(t==='match')restartMatch();
+  else if(t==='write')restartWrite();
 }
 function resetAll(){
   cardQueue=[];cardPos=0;cardFlipped=false;quizQueue=[];quizPos=0;qCorrect=0;qTotal=0;
@@ -1476,7 +1489,7 @@ function initCards(){
     document.getElementById('card-session-info').innerHTML='';
     document.getElementById('card-prog').style.width='0%';return;
   }
-  cardQueue=buildQueue(1);cardPos=0;cardFlipped=false;renderCard();
+  cardQueue=buildSRSQueue();cardPos=0;cardFlipped=false;renderCard();
 }
 function renderCard(){
   const w=activeWords[cardQueue[cardPos]];
@@ -1551,12 +1564,13 @@ function renderCard(){
 }
 function flipCard(){cardFlipped=!cardFlipped;const fc=document.getElementById('flashcard');if(fc)fc.classList.toggle('flipped',cardFlipped);}
 function classifyVocabCard(level){
-  if(!progressData || !currentCardWord) return;
-  const e = ensureWordEntry(currentCardWord);
-  const lvlMap = {0:0, 1:1, 2:3};
-  e.level = lvlMap[level];
-  e.lastSeen = new Date().toISOString().slice(0,10);
-  scheduleSave();
+  if(progressData && currentCardWord){
+    const e = ensureWordEntry(currentCardWord);
+    const lvlMap = {0:0, 1:1, 2:3};
+    e.level = lvlMap[level];
+    e.lastSeen = new Date().toISOString().slice(0,10);
+    scheduleSave();
+  }
   cardPos = cardPos < cardQueue.length-1 ? cardPos+1 : 0;
   cardFlipped = false;
   renderCard();
@@ -1585,13 +1599,6 @@ function setListSRSFilter(f){
   listSRSFilter=f;
   ['all','new','weak','ok','strong'].forEach(x=>document.getElementById('lf-'+x).classList.toggle('active',x===f));
   renderList();
-}
-function getSRSLevel(w){
-  if(!progressData) return -1;
-  const e=progressData.words[wordKey(w)];
-  if(!e||e.correct+e.wrong===0) return 0; // nueva
-  return e.level; // 0=débil,1=ok,2=fuerte... wait level 0 could be new or weak
-  // actually: new = no entry or no attempts; level 0 after attempts = weak
 }
 function wSRSLabel(w){
   if(!progressData) return 'nueva';
@@ -1643,6 +1650,7 @@ function renderList(){
           <div style="display:flex;gap:3px;flex-wrap:wrap"><span class="vocab-tag">Vocab. ${w.vocab}</span>${srsBadge(w)}</div>
           <div style="font-size:11px">${statsHtml}</div>
         </div>
+        ${kittelNote(w)}
       </div>
     </div>`;
   });
@@ -1658,12 +1666,12 @@ function isSynonym(a,b){
 function getSynonyms(w){return activeWords.filter(o=>o.gr!==w.gr&&isSynonym(o,w));}
 
 function setQuizMode(m){quizMode=m;document.getElementById('qbtn-gr-es').classList.toggle('active',m==='gr-es');document.getElementById('qbtn-es-gr').classList.toggle('active',m==='es-gr');initQuiz();}
-function initQuiz(){quizQueue=buildQueue(1);quizPos=0;qCorrect=0;qTotal=0;document.getElementById('q-correct').textContent=0;document.getElementById('q-total').textContent=0;document.getElementById('q-pct').textContent='—';renderQuiz();}
+function initQuiz(){quizQueue=buildSRSQueue();quizPos=0;qCorrect=0;qTotal=0;document.getElementById('q-correct').textContent=0;document.getElementById('q-total').textContent=0;document.getElementById('q-pct').textContent='—';renderQuiz();}
 function renderQuiz(){
   const area=document.getElementById('quiz-area');
   if(activeWords.length<4){area.innerHTML='<div class="empty-state">Necesitás al menos 4 palabras.</div>';document.getElementById('q-remain').textContent='—';document.getElementById('quiz-prog').style.width='0%';return;}
-  if(!quizQueue.length)quizQueue=buildQueue(1);
-  if(quizPos>=quizQueue.length){quizQueue=buildQueue(1);quizPos=0;}
+  if(!quizQueue.length)quizQueue=buildSRSQueue();
+  if(quizPos>=quizQueue.length){quizQueue=buildSRSQueue();quizPos=0;}
   document.getElementById('q-remain').textContent=quizQueue.length-quizPos;
   document.getElementById('quiz-prog').style.width=Math.round(quizPos/quizQueue.length*100)+'%';
   const correct=activeWords[quizQueue[quizPos]];
@@ -1723,7 +1731,7 @@ function checkAnswer(btn,isCorrect,correctGr,isSyn){
   document.getElementById('q-total').textContent=qTotal;
   document.getElementById('q-pct').textContent=Math.round(qCorrect/qTotal*100)+'%';
 }
-function advanceQuiz(){quizPos++;if(quizPos>=quizQueue.length){quizQueue=buildQueue(1);quizPos=0;}renderQuiz();}
+function advanceQuiz(){quizPos++;if(quizPos>=quizQueue.length){quizQueue=buildSRSQueue();quizPos=0;}renderQuiz();}
 function skipQuestion(){
   if(quizAnswered)return;
   const cur=quizQueue[quizPos];
@@ -1786,10 +1794,13 @@ function showMatchWin(){
 }
 
 // ── PHONETICS TOGGLE ──
+function setPhonetics(visible){
+  document.body.classList.toggle('phonetics-off',!visible);
+  document.getElementById('phon-toggle-label').textContent=visible?'Ocultar pronunciación':'Mostrar pronunciación';
+  document.getElementById('phon-toggle-btn').classList.toggle('hidden-state',!visible);
+}
 function togglePhonetics(){
-  const off=document.body.classList.toggle('phonetics-off');
-  document.getElementById('phon-toggle-label').textContent=off?'Mostrar pronunciación':'Ocultar pronunciación';
-  document.getElementById('phon-toggle-btn').classList.toggle('hidden-state',off);
+  setPhonetics(document.body.classList.contains('phonetics-off'));
 }
 
 // ── ESCRITURA ──────────────────────────────────────────────
@@ -1883,74 +1894,69 @@ function renderWrite(){
     area.innerHTML='<div class="empty-state">No hay palabras suficientes.</div>';
     return;
   }
-  if(writePos>=writeQueue.length){
-    showWriteSummary();
-    return;
-  }
   writeAnswered=false;
-  const w=activeWords[writeQueue[writePos]];
-  document.getElementById('w-remain').textContent=writeQueue.length-writePos;
-  document.getElementById('write-prog').style.width=Math.round(writePos/writeQueue.length*100)+'%';
-  area.innerHTML=`
-    <div class="write-card">
-      <div class="write-greek">${grShort(w)}</div>
-      <div class="write-phonetic phon-hideable">[ ${w.fn} ]</div>
-      <div class="write-type">${wcTypeLabel(w.type)}</div>
-    </div>
-    <div class="write-input-row">
-      <input type="text" class="write-input" id="write-input" placeholder="Escribí el/los significado(s) en español, separados por coma" autocomplete="off" autocapitalize="off" spellcheck="false">
-      <button class="write-submit" id="write-submit-btn" onclick="submitWrite()">Comprobar</button>
-    </div>
-    <div id="write-feedback-area"></div>
-    <button class="write-next" id="write-next-btn" disabled onclick="advanceWrite()">Siguiente →</button>`;
-  const inp=document.getElementById('write-input');
-  inp.focus();
-  inp.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitWrite(); } });
+  document.getElementById('w-remain').textContent=writeQueue.length;
+  document.getElementById('write-prog').style.width='0%';
+  const rows=writeQueue.map((qi,i)=>{
+    const w=activeWords[qi];
+    return '<div class="write-row">'
+      +'<div>'
+      +'<div class="write-row-greek">'+grShort(w)+'</div>'
+      +'<div class="write-row-ph phon-hideable">[ '+w.fn+' ]</div>'
+      +'<div style="font-size:10px;color:var(--text-muted);margin-top:2px">'+wcTypeLabel(w.type)+'</div>'
+      +'</div>'
+      +'<div>'
+      +'<input type="text" class="write-input" id="write-input-'+i+'" placeholder="Significado(s)" autocomplete="off" autocapitalize="off" spellcheck="false">'
+      +'<div class="write-row-feedback" id="write-fb-'+i+'"></div>'
+      +'</div></div>';
+  }).join('');
+  area.innerHTML='<div class="write-table">'+rows+'</div>'
+    +'<button class="write-submit" id="write-verify-btn" style="width:100%;margin-top:1rem" onclick="verifyWrite()">Verificar</button>'
+    +'<div id="write-summary"></div>';
+  writeQueue.forEach((_,i)=>{
+    document.getElementById('write-input-'+i).addEventListener('keydown',e=>{
+      if(e.key==='Enter'){
+        e.preventDefault();
+        const nx=document.getElementById('write-input-'+(i+1));
+        if(nx)nx.focus();else verifyWrite();
+      }
+    });
+  });
+  const first=document.getElementById('write-input-0');
+  if(first)first.focus();
 }
 
-function submitWrite(){
-  if(writeAnswered) return;
-  const inp=document.getElementById('write-input');
-  const val=inp.value.trim();
-  if(!val) return;
-  writeAnswered=true; wTotal++;
-  const w=activeWords[writeQueue[writePos]];
-  const result=checkWriteAnswer(val, w);
-  inp.disabled=true;
-  document.getElementById('write-submit-btn').disabled=true;
-  const fbArea=document.getElementById('write-feedback-area');
-  if(result.isCorrect){
-    wCorrect++;
-    inp.classList.add('correct');
-    fbArea.innerHTML=`<div class="write-feedback-box ok"><div class="wf-label">Correcto</div>Incluiste todos los significados: <span class="wf-answer">${result.expected.map(e=>'"'+e+'"').join(', ')}</span></div>`;
-  } else {
-    inp.classList.add('wrong');
-    fbArea.innerHTML=`<div class="write-feedback-box bad"><div class="wf-label">Incompleto / incorrecto</div>Significado(s) completo(s) requerido(s): <span class="wf-answer">${result.expected.map(e=>'"'+e+'"').join(', ')}</span><br>Te faltó: <span class="wf-answer">${result.missing.map(e=>'"'+e+'"').join(', ')}</span></div>`;
-  }
-  recordResult(w, result.isCorrect, 'escritura');
+function verifyWrite(){
+  if(writeAnswered)return;
+  writeAnswered=true;
+  wCorrect=0;wTotal=writeQueue.length;
+  writeQueue.forEach((qi,i)=>{
+    const w=activeWords[qi];
+    const inp=document.getElementById('write-input-'+i);
+    const res=checkWriteAnswer(inp.value.trim(),w);
+    inp.disabled=true;
+    inp.classList.add(res.isCorrect?'correct':'wrong');
+    const fb=document.getElementById('write-fb-'+i);
+    if(res.isCorrect){
+      wCorrect++;
+      fb.innerHTML='<span style="color:var(--green-text);font-weight:600">&#10003; Correcto</span>';
+    } else {
+      fb.innerHTML='<span style="color:var(--red-text)">&#10007; Respuesta: '+res.expected.map(x=>'“'+x+'”').join(', ')+'</span>';
+    }
+    recordResult(w,res.isCorrect,'escritura');
+  });
+  const pct=wTotal>0?Math.round(wCorrect/wTotal*100):0;
   document.getElementById('w-correct').textContent=wCorrect;
   document.getElementById('w-total').textContent=wTotal;
-  document.getElementById('w-pct').textContent=Math.round(wCorrect/wTotal*100)+'%';
-  document.getElementById('write-next-btn').disabled=false;
-}
-
-function advanceWrite(){
-  writePos++;
-  renderWrite();
-}
-
-function showWriteSummary(){
-  const pct = wTotal>0 ? Math.round(wCorrect/wTotal*100) : 0;
-  document.getElementById('write-prog').style.width='100%';
+  document.getElementById('w-pct').textContent=pct+'%';
   document.getElementById('w-remain').textContent=0;
-  document.getElementById('write-area').innerHTML=`
-    <div class="win-panel">
-      <div class="win-title">Ronda completa</div>
-      <div class="win-sub">${wCorrect} / ${wTotal} correctas · ${pct}% precisión</div>
-      <div>
-        <button class="win-btn primary" onclick="restartWrite()">Otra ronda igual</button>
-      </div>
-    </div>`;
+  document.getElementById('write-prog').style.width='100%';
+  document.getElementById('write-verify-btn').style.display='none';
+  document.getElementById('write-summary').innerHTML='<div class="win-panel" style="padding:1.6rem 1rem">'
+    +'<div class="win-title">Simulacro corregido</div>'
+    +'<div class="win-sub">'+wCorrect+' / '+wTotal+' correctas &middot; '+pct+'% precisión</div>'
+    +'<div><button class="win-btn primary" onclick="restartWrite()">Nueva ronda</button></div>'
+    +'</div>';
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -2216,7 +2222,7 @@ function renderProgressPanel(){
   const strong=allEntries.filter(e=>e.level===3&&e.correct+e.wrong>0).length;
   const inprog=allEntries.filter(e=>(e.level===1||e.level===2)&&e.correct+e.wrong>0).length;
   const weak=allEntries.filter(e=>e.level===0&&e.correct+e.wrong>0).length;
-  const unseen=250-seenEntries.length;
+  const unseen=TOTAL_WORDS-seenEntries.length;
   const totalC=allEntries.reduce((a,e)=>a+e.correct,0);
   const totalW=allEntries.reduce((a,e)=>a+e.wrong,0);
   const acc=totalC+totalW>0?Math.round(totalC/(totalC+totalW)*100):0;
@@ -2239,7 +2245,7 @@ function renderPPTab(){
 
 function renderPPVocab(){
   const el=document.getElementById('pp-vocab-view');
-  // collect all 250 words grouped by vocab
+  // collect all words grouped by vocab
   let html=`<div class="pp-bar-legend" style="margin-bottom:.8rem">
     <div class="pp-legend-item"><div class="pp-legend-dot" style="background:var(--green)"></div>Aprendida</div>
     <div class="pp-legend-item"><div class="pp-legend-dot" style="background:#D49B24"></div>En progreso</div>
@@ -2279,7 +2285,7 @@ function renderPPVocab(){
 
 function renderPPWords(filter='all'){
   const el=document.getElementById('pp-words-view');
-  // gather all 250 words with their progress
+  // gather all words with their progress
   const allWords=[];
   Object.keys(VOCABS).forEach(vk=>{
     VOCABS[vk].words.forEach(w=>{
@@ -2297,7 +2303,7 @@ function renderPPWords(filter='all'){
   });
   const sorted=[...seen,...unseen];
   if(sorted.length===0){el.innerHTML='<div class="pp-no-data">Sin datos aún.</div>';return;}
-  let html=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:.6rem">Ordenadas de más débil a más fuerte · ${seen.length} estudiadas de 250</div>
+  let html=`<div style="font-size:11px;color:var(--text-muted);margin-bottom:.6rem">Ordenadas de más débil a más fuerte · ${seen.length} estudiadas de ${TOTAL_WORDS}</div>
   <table class="pp-word-table">
     <thead><tr>
       <th>Palabra</th><th>Vocab.</th><th>Nivel</th><th>✓ / ✗</th><th>Racha</th>
@@ -2346,173 +2352,7 @@ function renderPPHistory(){
   el.innerHTML=html;
 }
 
-// ── DRIVE: save / load ──
-
-
-async function saveProgress(){
-  if(!accessToken||!progressData) return;
-  setSyncStatus('syncing','Guardando...');
-  try {
-    const body = JSON.stringify(progressData);
-    if(progressFileId){
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${progressFileId}?uploadType=media`,{
-        method:'PATCH',
-        headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
-        body
-      });
-    } else {
-      // crear archivo
-      const meta = await fetch('https://www.googleapis.com/drive/v3/files',{
-        method:'POST',
-        headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
-        body:JSON.stringify({name:FILE_NAME,parents:['appDataFolder']})
-      }).then(r=>r.json());
-      progressFileId = meta.id;
-      await fetch(`https://www.googleapis.com/upload/drive/v3/files/${progressFileId}?uploadType=media`,{
-        method:'PATCH',
-        headers:{'Authorization':'Bearer '+accessToken,'Content-Type':'application/json'},
-        body
-      });
-    }
-    setSyncStatus('online','Guardado en Drive');
-  } catch(e){
-    setSyncStatus('offline','Error al guardar');
-  }
-}
-
-async function loadProgress(){
-  setSyncStatus('syncing','Cargando progreso...');
-  try {
-    // buscar archivo existente
-    const res = await fetch(
-      `https://www.googleapis.com/drive/v3/files?spaces=appDataFolder&q=name='${FILE_NAME}'&fields=files(id,name)`,
-      {headers:{'Authorization':'Bearer '+accessToken}}
-    ).then(r=>r.json());
-    if(res.files&&res.files.length>0){
-      progressFileId = res.files[0].id;
-      const content = await fetch(
-        `https://www.googleapis.com/drive/v3/files/${progressFileId}?alt=media`,
-        {headers:{'Authorization':'Bearer '+accessToken}}
-      ).then(r=>r.json());
-      progressData = content;
-      if(!progressData.morfo) progressData.morfo = {};
-      applyMorfoDecay();
-      setSyncStatus('online','Conectado · progreso cargado');
-    } else {
-      progressData = initProgress();
-      setSyncStatus('online','Conectado · nuevo progreso creado');
-    }
-    document.getElementById('progress-panel').style.display='';
-    renderProgressPanel();
-    // Re-aplicar filtros ahora que progressData está disponible
-    if(activeWords.length) buildActiveWords();
-  } catch(e){
-    setSyncStatus('offline','Error al cargar');
-    progressData = initProgress();
-  }
-}
-
-// ── AUTH ──
-let reconnectTimer = null;
-
-function initGoogleAuth(){
-  if(!window.google) return;
-  tokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: CLIENT_ID,
-    scope: SCOPES,
-    prompt: '',
-    callback: async (resp) => {
-      if(reconnectTimer){ clearTimeout(reconnectTimer); reconnectTimer=null; }
-      if(resp.error){
-        // error_subtype 'access_denied' o 'user_logged_out' → limpiar flag
-        // otros errores → mantener flag para reintentar la próxima vez
-        if(resp.error==='access_denied'||resp.error==='user_logged_out'){
-          localStorage.removeItem('griego_drive_authorized');
-        }
-        setSyncStatus('offline','Sin conexión con Drive');
-        document.getElementById('sync-btn').textContent='Conectar con Google Drive';
-        document.getElementById('sync-btn').classList.remove('signout');
-        document.getElementById('sync-btn').onclick=handleAuthClick;
-        return;
-      }
-      accessToken = resp.access_token;
-      localStorage.setItem('griego_drive_authorized','1');
-      document.getElementById('sync-btn').textContent='Desconectar';
-      document.getElementById('sync-btn').classList.add('signout');
-      document.getElementById('sync-btn').onclick=handleSignOut;
-      await loadProgress();
-    }
-  });
-  // Si el usuario ya autorizó antes, reconectar silenciosamente sin popup
-  if(localStorage.getItem('griego_drive_authorized')==='1'){
-    setSyncStatus('syncing','Reconectando con Drive...');
-    setTimeout(()=>{
-      tokenClient.requestAccessToken({prompt:''});
-    }, 800);
-    // Fallback: si a los 10 segundos no hubo respuesta del callback,
-    // volver a estado offline sin borrar el flag
-    reconnectTimer = setTimeout(()=>{
-      reconnectTimer = null;
-      if(!accessToken){
-        setSyncStatus('offline','Sin conexión con Drive');
-        document.getElementById('sync-btn').textContent='Conectar con Google Drive';
-        document.getElementById('sync-btn').classList.remove('signout');
-        document.getElementById('sync-btn').onclick=handleAuthClick;
-      }
-    }, 10000);
-  }
-}
-
-function handleAuthClick(){
-  if(!tokenClient){ setSyncStatus('offline','Google no disponible'); return; }
-  // Si ya autorizó antes, intentar silencioso primero
-  if(localStorage.getItem('griego_drive_authorized')==='1'){
-    setSyncStatus('syncing','Reconectando con Drive...');
-    tokenClient.requestAccessToken({prompt:''});
-    // Si en 5 segundos no responde, mostrar popup de consentimiento
-    reconnectTimer = setTimeout(()=>{
-      reconnectTimer = null;
-      if(!accessToken){
-        tokenClient.requestAccessToken({prompt:'consent'});
-      }
-    }, 5000);
-  } else {
-    tokenClient.requestAccessToken({prompt:'consent'});
-  }
-}
-
-function handleSignOut(){
-  if(accessToken) google.accounts.oauth2.revoke(accessToken);
-  accessToken=null; progressFileId=null; progressData=null;
-  localStorage.removeItem('griego_drive_authorized');
-  document.getElementById('sync-btn').textContent='Conectar con Google Drive';
-  document.getElementById('sync-btn').classList.remove('signout');
-  document.getElementById('sync-btn').onclick=handleAuthClick;
-  document.getElementById('progress-panel').style.display='none';
-  setSyncStatus('offline','Sin conexión con Drive');
-}
-
-function setSyncStatus(state, label){
-  const dot=document.getElementById('sync-dot');
-  dot.className='sync-dot '+state;
-  document.getElementById('sync-label').textContent=label;
-}
-
-window.addEventListener('load', ()=>{
-  const wait = setInterval(()=>{
-    if(window.google&&window.google.accounts){
-      clearInterval(wait);
-      initGoogleAuth();
-    }
-  }, 200);
-});
-
-// Renovar token automáticamente cada 50 min para evitar que expire durante el estudio
-setInterval(()=>{
-  if(tokenClient && localStorage.getItem('griego_drive_authorized')==='1'){
-    tokenClient.requestAccessToken({prompt:''});
-  }
-}, 50 * 60 * 1000);
+// (Bloque legado de Google Drive eliminado — auth y progreso usan Supabase.)
 
 
 // ── NOTAS TEOLÓGICAS (Kittel TDNT Compendio) ──
@@ -2525,7 +2365,6 @@ const KITTEL = {
   "βασιλεία, ἡ":     { nota: "βασιλεία designa primariamente el reinado o soberanía de Dios, no un territorio. En Jesús el reino irrumpe desde Dios; el propio Jesús es la autobasileia (reino en persona).", ref: "K. G. Kuhn, Kittel TDNT compendio I, pp. 86–105" },
   "ἁμαρτία, ἡ":      { nota: "ἁμαρτία (lit. 'fallar el blanco') expresa en el NT la culpa moral y la oposición consciente a Dios. Pablo la trata como poder que esclaviza a toda la humanidad desde Adán (Ro 5–7).", ref: "G. Stählin / W. Grundmann, Kittel TDNT compendio I, pp. 55–57" },
   "λόγος, ὁ":        { nota: "λόγος en el NT designa el discurso divino concreto que Dios dirige a los hombres. A diferencia del logos griego (principio racional cósmico), el λόγος del NT es personal, histórico y encarnado (Jn 1:14).", ref: "H. Kleinknecht / O. Procksch, Kittel TDNT compendio IV, pp. 77–100" },
-  "ζωή, ἡ":          { nota: "ζωή en el NT trasciende la vitalidad física: designa la vida que Dios da en Cristo, que comienza aquí y se extiende a la eternidad. Juan y Pablo la asocian con el Espíritu y la resurrección.", ref: "R. Bultmann, Kittel TDNT compendio II (ver parte 2)" },
   "αἰών, -ῶνος, ὁ":  { nota: "αἰών significa tanto 'eternidad' como 'eón/mundo presente'. El NT opone 'este eón' (dominado por el pecado) al 'eón venidero' (reino de Dios). La fórmula 'por los siglos de los siglos' enfatiza la eternidad de Dios y de Cristo.", ref: "G. Delling, Kittel TDNT compendio I, pp. 39–40" },
   "ἐξουσία, ἡ":      { nota: "ἐξουσία denota la potestad para actuar, dada por Dios. En el NT se aplica al poder de Dios, a la autoridad otorgada a Cristo (Mt 28:18) y a la libertad dada a los creyentes.", ref: "W. Foerster, Kittel TDNT compendio II, p. 190" },
   "ῥῆμα, -ατος, τό": { nota: "ῥῆμα designa el enunciado concreto y específico, a diferencia de λόγος que es más amplio. En el NT ambos son casi sinónimos, aunque ῥῆμα enfatiza más el acto concreto de hablar.", ref: "A. Debrunner, Kittel TDNT compendio IV, pp. 69–77" },
@@ -2569,8 +2408,21 @@ function applyMorfoDecay(){
   });
 }
 
-// ── MORFO SRS WEIGHT ──
-// Nivel 0 y 1 aparecen más; nivel 2 (aprendida) menos frecuente
+// ── MORFO PROGRESS HELPERS ──
+function morfoCardKey(card, section){ return section + '|' + card.prompt; }
+function getMorfoLevel(key){
+  if(!progressData || !progressData.morfo || !progressData.morfo[key]) return 0;
+  return progressData.morfo[key].level || 0;
+}
+function classifyMorfoCard(key, level){
+  if(!progressData) return;
+  if(!progressData.morfo[key]) progressData.morfo[key] = {level:0, lastSeen:null, timesStudied:0};
+  var e = progressData.morfo[key];
+  e.level = level;
+  e.lastSeen = new Date().toISOString().slice(0,10);
+  e.timesStudied = (e.timesStudied||0) + 1;
+  scheduleSave();
+}
 
 // ── SECTION SWITCHING ──
 function switchSection(s){
@@ -2651,9 +2503,9 @@ var VERBAL = {
 
 // Stems λύω para formas conjugadas
 var CONJ_STEMS = {
-  activa:  ['λυ','ἐλυσ','ἐλυ','λελυκ','λυσ'],
-  media:   ['λυ','ἐλυσ','ἐλυ','λελυ','λυσ'],
-  pasiva:  ['λυ','ἐλυθ','ἐλυ','λελυ','λυθησ'],
+  activa:  ['λυ','ἐλυ','ἐλυ','λελυ','λυ'],
+  media:   ['λυ','ἐλυ','ἐλυ','λελυ','λυ'],
+  pasiva:  ['λυ','ἐλυ','ἐλυ','λελυ','λυ'],
 };
 
 // ══════════════════════════════════════════
@@ -2779,42 +2631,6 @@ function classifyAndAdvanceNominal(level){
   renderNominalCard();
 }
 function nominalCardNav(d){ nominalCardPos=Math.max(0,Math.min(nominalCards.length-1,nominalCardPos+d)); nominalCardFlipped=false; renderNominalCard(); }
-
-function renderNominalList(){
-  var area = document.getElementById('nominal-list-content');
-  var html = '';
-
-  if(nominalFilter==='all'||nominalFilter==='articulo'){
-    html += '<div class="morfo-paradigm-title">Paradigma flexivo completo del artículo</div>';
-    html += '<table class="morfo-table"><thead><tr><th></th><th>M</th><th>F</th><th>N</th></tr></thead><tbody>';
-    ARTICULO.forEach(function(r){
-      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.m+'</td><td class="greek">'+r.f+'</td><td class="greek">'+r.n+'</td></tr>';
-    });
-    html += '</tbody></table>';
-    html += '<div class="morfo-quick-note">* El artículo debe concertar en caso, género y número con el nombre que determina.</div>';
-  }
-
-  if(nominalFilter==='all'||nominalFilter==='1decl'){
-    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 1ª Declinación (F/M)</div>';
-    html += '<table class="morfo-table"><thead><tr><th></th><th>1ª Decl.</th></tr></thead><tbody>';
-    DECL1.forEach(function(r){
-      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td></tr>';
-    });
-    html += '</tbody></table>';
-  }
-
-  if(nominalFilter==='all'||nominalFilter==='2decl'){
-    html += '<div class="morfo-paradigm-title">Paradigma flexivo casual — 2ª Declinación</div>';
-    html += '<table class="morfo-table"><thead><tr><th></th><th>2ª Decl. M/F</th><th>2ª Decl. N</th></tr></thead><tbody>';
-    DECL2_MF.forEach(function(r,i){
-      html += '<tr><td>'+r.caso+'</td><td class="greek">'+r.des+'</td><td class="greek">'+DECL2_N[i].des+'</td></tr>';
-    });
-    html += '</tbody></table>';
-    html += '<div class="morfo-quick-note">* Falta aquí la 3ª declinación (Velardo, apunte G1).</div>';
-  }
-
-  area.innerHTML = html || '<div class="empty-state">Sin contenido.</div>';
-}
 
 function initNominalQuiz(){
   nominalCards = buildNominalCards(nominalFilter);
@@ -3033,36 +2849,6 @@ function classifyAndAdvanceVerbal(level){
 }
 function verbalCardNav(d){verbalCardPos=Math.max(0,Math.min(verbalCards.length-1,verbalCardPos+d));verbalCardFlipped=false;renderVerbalCard();}
 
-function renderVerbalList(){
-  var area=document.getElementById('verbal-list-content');
-  var html='';
-  TIEMPO_ORDEN.forEach(function(fname){
-    if(verbalFilter!=='all'&&verbalFilter!==fname)return;
-    var ti=TIEMPO_IDX[fname];
-    VOCES.forEach(function(voz){
-      html+='<div class="morfo-paradigm-title">Ind. '+VERBAL.tiempos[ti]+' — Voz '+voz+'</div>';
-      html+='<table class="morfo-table"><thead><tr><th>Persona</th><th>Desinencia</th>';
-      if(verbalMode==='conj') html+='<th>λύω (ej.)</th>';
-      html+='</tr></thead><tbody>';
-      VERBAL.personas.forEach(function(p,pi){
-        var des=VERBAL[voz][ti][pi];
-        var cleanDes=des.replace(/‑/g,'').replace(/\(ν\)/,'ν');
-        var conj=CONJ_STEMS[voz][ti]+cleanDes;
-        // Media y pasiva idénticas excepto aoristo(1) y futuro(4)
-        var isGrey=(voz==='pasiva')&&(ti!==1&&ti!==4);
-        html+='<tr><td>'+p+'</td><td class="greek'+(isGrey?' grey':'')+'">'+des+'</td>';
-        if(verbalMode==='conj') html+='<td class="greek">'+conj+'</td>';
-        html+='</tr>';
-      });
-      html+='</tbody></table>';
-    });
-  });
-  if(verbalFilter==='all'||verbalFilter==='aoristo'||verbalFilter==='futuro'){
-    html+='<div class="morfo-quick-note">* Las voces media y pasiva tienen la misma conjugación, excepto en el aoristo y en el futuro (marcadas en gris las iguales a la media).<br>* El aumento (ε) indica tiempo pasado. La reduplicación indica perfecto.</div>';
-  }
-  area.innerHTML=html||'<div class="empty-state">Sin contenido.</div>';
-}
-
 var vQuizPos=0, vQuizQueue=[];
 function initVerbalQuiz(){
   verbalCards=buildVerbalCards(verbalFilter,verbalMode);
@@ -3170,62 +2956,7 @@ function renderVerbalQuick(){
 }
 
 // ── INIT ──
-renderVocabChips();renderTypeChips();initCards();
-
-// ── PWA SERVICE WORKER ──
-if('serviceWorker' in navigator){
-  const swCode = `
-    const CACHE = 'griego-v1';
-    const OFFLINE_URLS = ['/'];
-    self.addEventListener('install', e => {
-      e.waitUntil(caches.open(CACHE).then(c => c.addAll(OFFLINE_URLS)));
-      self.skipWaiting();
-    });
-    self.addEventListener('activate', e => {
-      e.waitUntil(caches.keys().then(keys =>
-        Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))
-      ));
-      self.clients.claim();
-    });
-    self.addEventListener('fetch', e => {
-      if(e.request.method !== 'GET') return;
-      e.respondWith(
-        fetch(e.request).catch(() => caches.match(e.request))
-      );
-    });
-  `;
-  const blob = new Blob([swCode], {type:'application/javascript'});
-  const swUrl = URL.createObjectURL(blob);
-  navigator.serviceWorker.register(swUrl).catch(()=>{});
-}
-
-// ── PWA INSTALL PROMPT ──
-let deferredInstallPrompt = null;
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  document.getElementById('install-btn').style.display = 'block';
-});
-function installApp(){
-  if(!deferredInstallPrompt) return;
-  deferredInstallPrompt.prompt();
-  deferredInstallPrompt.userChoice.then(()=>{
-    deferredInstallPrompt = null;
-    document.getElementById('install-btn').style.display = 'none';
-  });
-}
-window.addEventListener('appinstalled', ()=>{
-  document.getElementById('install-btn').style.display = 'none';
-});
-
-</script>
-</body>
-</html>
-
-
-
-// ── INIT ──
-renderVocabChips();renderTypeChips();initCards();
+renderVocabChips();renderTypeChips();
 
 // ── PWA SERVICE WORKER ──
 if('serviceWorker' in navigator){
