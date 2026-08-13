@@ -1614,6 +1614,7 @@ function classifyVocabCard(level){
     e.level = lvlMap[level];
     e.lastSeen = new Date().toISOString().slice(0,10);
     scheduleSave();
+    if(progressPanelOpen) renderProgressPanel();
   }
   cardPos = cardPos < cardQueue.length-1 ? cardPos+1 : 0;
   cardFlipped = false;
@@ -2184,6 +2185,7 @@ async function saveProgress(){
   if(!currentUser || !progressData) return;
   const uid = currentUser.id;
   const today = new Date().toISOString().slice(0,10);
+  let saveError = null;
 
   // Save vocab progress
   const vocabRows = Object.entries(progressData.words).map(([word_key, d]) => ({
@@ -2193,7 +2195,8 @@ async function saveProgress(){
     updated_at: new Date().toISOString()
   }));
   if(vocabRows.length > 0){
-    await supa.from('progress_vocab').upsert(vocabRows, { onConflict: 'user_id,word_key' });
+    const { error } = await supa.from('progress_vocab').upsert(vocabRows, { onConflict: 'user_id,word_key' });
+    if(error) saveError = error;
   }
 
   // Save morfo progress
@@ -2204,7 +2207,27 @@ async function saveProgress(){
     updated_at: new Date().toISOString()
   }));
   if(morfoRows.length > 0){
-    await supa.from('progress_morfo').upsert(morfoRows, { onConflict: 'user_id,card_key' });
+    const { error } = await supa.from('progress_morfo').upsert(morfoRows, { onConflict: 'user_id,card_key' });
+    if(error) saveError = error;
+  }
+
+  // Save daily history
+  if(progressData.history.length > 0){
+    const histRows = progressData.history.map(d => ({
+      user_id: uid, date: d.date,
+      correct: d.correct||0, wrong: d.wrong||0,
+      modes: (d.modes||[]).join(','),
+      updated_at: new Date().toISOString()
+    }));
+    const { error } = await supa.from('progress_history').upsert(histRows, { onConflict: 'user_id,date' });
+    if(error) saveError = error;
+  }
+
+  if(saveError){
+    console.error('Error al guardar progreso:', saveError);
+    setSyncStatus('offline','Error al guardar: ' + saveError.message);
+  } else if(vocabRows.length || morfoRows.length){
+    setSyncStatus('online','Progreso guardado');
   }
 }
 
@@ -2234,6 +2257,17 @@ async function loadProgress(){
         level: r.level, lastSeen: r.last_seen, timesStudied: r.times_studied
       };
     });
+  }
+
+  // Load daily history (últimos 30 días)
+  const { data: histData } = await supa.from('progress_history')
+    .select('*').eq('user_id', uid)
+    .order('date', { ascending: false }).limit(30);
+  if(histData){
+    progressData.history = histData.map(r => ({
+      date: r.date, correct: r.correct||0, wrong: r.wrong||0,
+      modes: r.modes ? r.modes.split(',') : []
+    }));
   }
 
   if(typeof applyMorfoDecay === 'function') applyMorfoDecay();
@@ -2277,8 +2311,9 @@ function recordResult(w, isCorrect, mode){
   }
   if(isCorrect) day.correct++; else day.wrong++;
   if(!day.modes.includes(mode)) day.modes.push(mode);
-  // guardar con debounce
+  // guardar con debounce + refrescar panel si está abierto
   scheduleSave();
+  if(progressPanelOpen) renderProgressPanel();
 }
 
 // ── SRS: ajusta la probabilidad de aparición según nivel ──
@@ -2531,6 +2566,7 @@ function classifyMorfoCard(key, level){
   e.lastSeen = new Date().toISOString().slice(0,10);
   e.timesStudied = (e.timesStudied||0) + 1;
   scheduleSave();
+  if(progressPanelOpen) renderProgressPanel();
 }
 
 // ── SECTION SWITCHING ──
