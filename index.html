@@ -1609,12 +1609,11 @@ function renderCard(){
 function flipCard(){cardFlipped=!cardFlipped;const fc=document.getElementById('flashcard');if(fc)fc.classList.toggle('flipped',cardFlipped);}
 function classifyVocabCard(level){
   if(progressData && currentCardWord){
+    // registra el intento (cuenta, historial, panel) y luego fija el nivel elegido
+    recordResult(currentCardWord, level > 0, 'flashcards');
     const e = ensureWordEntry(currentCardWord);
     const lvlMap = {0:0, 1:1, 2:3};
     e.level = lvlMap[level];
-    e.lastSeen = new Date().toISOString().slice(0,10);
-    scheduleSave();
-    if(progressPanelOpen) renderProgressPanel();
   }
   cardPos = cardPos < cardQueue.length-1 ? cardPos+1 : 0;
   cardFlipped = false;
@@ -2296,7 +2295,8 @@ function recordResult(w, isCorrect, mode){
   if(isCorrect){
     e.correct++;
     e.streak++;
-    e.level = Math.min(3, Math.floor(Math.log2(e.streak+1)));
+    // el nivel sube con la racha pero nunca baja por un acierto
+    e.level = Math.max(e.level, Math.min(3, Math.floor(Math.log2(e.streak+1))));
   } else {
     e.wrong++;
     e.streak = 0;
